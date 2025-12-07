@@ -1,70 +1,58 @@
 package com.github.br.libgdx.jam35;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
+import com.github.br.libgdx.jam35.model.GameModel;
+import com.github.br.libgdx.jam35.ui.GameFieldScreen;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
-public class Main extends ApplicationAdapter {
-    private Stage stage;
-    private Skin skin;
+public class Main extends Game {
+
+    private GameContext context;
+    private GameFieldScreen gameFieldScreen;
 
     @Override
     public void create() {
-        stage = new Stage(new FitViewport(640, 480));
-        skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
+        FitViewport fitViewport = new FitViewport(1024, 768);
+        context = createGameContext(fitViewport);
+        loadAssets(context.getAssetManager());
 
-        Window window = new Window("Example screen", skin, "border");
-        window.defaults().pad(4f);
-        window.add("This is a simple Scene2D view.").row();
-        final TextButton button = new TextButton("Click me!", skin);
-        button.pad(8f);
-        button.addListener(new ChangeListener() {
-            @Override
-            public void changed(final ChangeEvent event, final Actor actor) {
-                button.setText("Clicked.");
-            }
-        });
-        window.add(button);
-        window.pack();
-        // We round the window position to avoid awkward half-pixel artifacts.
-        // Casting using (int) would also work.
-        window.setPosition(MathUtils.roundPositive(stage.getWidth() / 2f - window.getWidth() / 2f),
-            MathUtils.roundPositive(stage.getHeight() / 2f - window.getHeight() / 2f));
-        window.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(1f)));
-        stage.addActor(window);
+        context.getGameModel().init();
 
-        Gdx.input.setInputProcessor(stage);
+        gameFieldScreen = new GameFieldScreen(context);
+        setScreen(gameFieldScreen);
     }
 
-    @Override
-    public void render() {
-        ScreenUtils.clear(0f, 0f, 0f, 1f);
-        stage.act(Gdx.graphics.getDeltaTime());
-        stage.draw();
+    private GameContext createGameContext(Viewport viewport) {
+        return new GameContext(
+            new GameModel(),
+            viewport,
+            new AssetManager(new InternalFileHandleResolver(), true)
+        );
     }
 
-    @Override
-    public void resize(int width, int height) {
-        // If the window is minimized on a desktop (LWJGL3) platform, width and height are 0, which causes problems.
-        // In that case, we don't resize anything, and wait for the window to be a normal size before updating.
-        if(width <= 0 || height <= 0) return;
+    private void loadAssets(AssetManager assetManager) {
+        assetManager.load(Res.CELL, Texture.class);
+        assetManager.load(Res.FUTURE_CELL, Texture.class);
+        assetManager.load(Res.SELECTED_CELL, Texture.class);
+        //assetManager.load(Res.SKIN, Skin.class);
 
-        stage.getViewport().update(width, height);
+        assetManager.finishLoading();
     }
 
     @Override
     public void dispose() {
-        stage.dispose();
-        skin.dispose();
+        super.dispose();
+
+        AssetManager assetManager = context.getAssetManager();
+        assetManager.unload(Res.CELL);
+        assetManager.unload(Res.FUTURE_CELL);
+        assetManager.unload(Res.SELECTED_CELL);
     }
+
 }
