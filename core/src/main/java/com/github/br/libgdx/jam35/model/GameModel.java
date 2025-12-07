@@ -21,6 +21,9 @@ public class GameModel {
                 cell.setX(i);
                 cell.setY(j);
                 cell.setType(CellType.EMPTY);
+                if (i == j) {
+                    cell.setType(CellType.OUR_CELL);
+                }
 
                 cells[i][j] = cell;
             }
@@ -55,6 +58,53 @@ public class GameModel {
         for (Listener listener : listeners) {
             listener.update(this);
         }
+    }
+
+    public void step(Cell from, Cell to) {
+        validationStep(from, to);
+
+        //TODO игровая логика
+        System.out.println("\nfrom [" + from.getX() + "; " + from.getY() + "], type [" + from.getType() + "]" +
+            "\nto [" + to.getX() + "; " + to.getY() + "], type [" + to.getType() + "]");
+    }
+
+    private void validationStep(Cell from, Cell to) {
+        CellType fromType = from.getType();
+        CellType toType = to.getType();
+        boolean isNeedTrowException = false;
+        if (!isAbleToStep(to.getX(), to.getY()) || from == to) {
+            isNeedTrowException = true;
+        } else if (CellType.OUR_CELL != fromType || CellType.EMPTY != toType) {
+            isNeedTrowException = true;
+        }
+
+        if (isNeedTrowException) {
+            throw new IllegalArgumentException(
+                "Incorrect step:" +
+                    "\nfrom [" + from.getX() + ";" + from.getY() + "], type [" + fromType + "]" +
+                    "\nto [" + to.getX() + "; " + to.getY() + "], type [" + toType + "]"
+            );
+        }
+    }
+
+    public boolean isAbleToStep(int toX, int toY) {
+        if (Grid.NULL_OBJECT == grid) {
+            return false;
+        }
+
+        Cell[][] cells = grid.getGrid();
+        int maxX = cells.length - 1;
+        int maxY = cells[0].length - 1;
+
+        if (toX < 0 || toX > maxX) {
+            return false;
+        }
+
+        if (toY < 0 || toY > maxY) {
+            return false;
+        }
+
+        return true;
     }
 
     public interface Listener {
