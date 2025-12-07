@@ -47,7 +47,7 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
 
             if (currentFsmState == InterfaceFSM.SELECT_CELL_FROM) {
                 // валидация
-                if (!isAbleToFromSelect(currentCell)) {
+                if (!isOurCell(currentCell)) {
                     return;
                 }
                 if (type != CellImageType.NONE) {
@@ -71,6 +71,10 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
                         currentFsmState = InterfaceFSM.SELECT_CELL_FROM;
                         break;
                     case FUTURE_STEP:
+                        if (isOurCell(currentCell)) {
+                            return;
+                        }
+
                         to = currentCell;
                         GameModel gameModel = context.getGameModel();
 
@@ -88,7 +92,7 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
         }
     };
 
-    private boolean isAbleToFromSelect(CellImage currentCell) {
+    private boolean isOurCell(CellImage currentCell) {
         Cell currentModel = currentCell.getModel();
         return CellType.OUR_CELL == currentModel.getType();
     }
