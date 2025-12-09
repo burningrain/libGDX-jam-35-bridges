@@ -9,12 +9,10 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.github.br.libgdx.jam35.GameContext;
 import com.github.br.libgdx.jam35.Res;
 import com.github.br.libgdx.jam35.model.Cell;
-import com.github.br.libgdx.jam35.model.CellType;
 import com.github.br.libgdx.jam35.model.GameModel;
 import com.github.br.libgdx.jam35.model.Grid;
 
@@ -25,129 +23,21 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
     private Stage stage;
     private Skin skin;
 
-    private CellImage[][] cells;
-
-    private CellImage from;
-    private CellImage to;
-    private final Array<CellImage> selectedFutureStepCells = new Array<>(4);
-
-    private InterfaceFSM currentFsmState = InterfaceFSM.SELECT_CELL_FROM;
-
-    public enum InterfaceFSM {
-        SELECT_CELL_FROM,
-        SELECT_CELL_TO,
-        STEP
-    }
+    private final GameFieldUi gameFieldUi;
+    private final UiFsm fsm;
 
     private final ClickListener cellListener = new ClickListener() {
         @Override
         public void clicked(InputEvent event, float x, float y) {
             CellImage currentCell = (CellImage) event.getTarget();
-            CellImageType type = currentCell.getType();
-
-            if (currentFsmState == InterfaceFSM.SELECT_CELL_FROM) {
-                // валидация
-                if (!isOurCell(currentCell)) {
-                    return;
-                }
-                if (type != CellImageType.NONE) {
-                    return;
-                }
-
-                deselect(from);
-                deselectFutureCells(selectedFutureStepCells);
-                select(currentCell);
-                selectFutureCells(currentCell, selectedFutureStepCells);
-                from = currentCell;
-
-                currentFsmState = InterfaceFSM.SELECT_CELL_TO;
-            } else if (currentFsmState == InterfaceFSM.SELECT_CELL_TO) {
-                switch (type) {
-                    case SELECTED:
-                        deselect(from);
-                        deselectFutureCells(selectedFutureStepCells);
-                        from = null;
-
-                        currentFsmState = InterfaceFSM.SELECT_CELL_FROM;
-                        break;
-                    case FUTURE_STEP:
-                        if (isOurCell(currentCell)) {
-                            return;
-                        }
-
-                        to = currentCell;
-                        GameModel gameModel = context.getGameModel();
-
-                        Cell modelFrom = from.getModel();
-                        Cell modelTo = to.getModel();
-                        from = null;
-                        to = null;
-                        selectedFutureStepCells.clear();
-
-                        currentFsmState = InterfaceFSM.STEP;
-                        gameModel.step(modelFrom, modelTo);
-                        break;
-                }
-            }
+            fsm.handle(currentCell);
         }
     };
 
-    private boolean isOurCell(CellImage currentCell) {
-        Cell currentModel = currentCell.getModel();
-        return CellType.OUR_CELL == currentModel.getType();
-    }
-
-    private void selectFutureCells(CellImage currentCell, Array<CellImage> selectedFutureStepCells) {
-        GameModel gameModel = context.getGameModel();
-        Cell cellModel = currentCell.getModel();
-        int currentX = cellModel.getX();
-        int currentY = cellModel.getY();
-
-        // налево
-        if (gameModel.isAbleToStep(currentX - 1, currentY)) {
-            selectedFutureStepCells.add(cells[currentX - 1][currentY]);
-        }
-
-        // направо
-        if (gameModel.isAbleToStep(currentX + 1, currentY)) {
-            selectedFutureStepCells.add(cells[currentX + 1][currentY]);
-        }
-
-        // вверх
-        if (gameModel.isAbleToStep(currentX, currentY + 1)) {
-            selectedFutureStepCells.add(cells[currentX][currentY + 1]);
-        }
-
-        // вниз
-        if (gameModel.isAbleToStep(currentX, currentY - 1)) {
-            selectedFutureStepCells.add(cells[currentX][currentY - 1]);
-        }
-
-        for (CellImage selectedFutureStepCell : selectedFutureStepCells) {
-            selectedFutureStepCell.setSelectType(CellImageType.FUTURE_STEP);
-        }
-    }
-
-    private void deselectFutureCells(Array<CellImage> futureStepCells) {
-        for (CellImage futureStepCell : futureStepCells) {
-            futureStepCell.setSelectType(CellImageType.NONE);
-        }
-        futureStepCells.clear();
-    }
-
-    private void select(CellImage currentCell) {
-        currentCell.setSelectType(CellImageType.SELECTED);
-    }
-
-    private void deselect(CellImage cell) {
-        if (cell == null) {
-            return;
-        }
-        cell.setSelectType(CellImageType.NONE);
-    }
-
     public GameFieldScreen(GameContext context) {
         this.context = context;
+        this.gameFieldUi = new GameFieldUi();
+        this.fsm = new UiFsm(gameFieldUi, context);
     }
 
     @Override
@@ -167,8 +57,8 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
             return;
         }
 
-        if (cells == null) {
-            cells = createGrid(modelGrid);
+        if (gameFieldUi.isEmpty()) {
+            gameFieldUi.initGrid(createGrid(modelGrid));
         }
 
     }
