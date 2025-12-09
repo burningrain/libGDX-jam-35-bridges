@@ -1,19 +1,22 @@
 package com.github.br.libgdx.jam35.model;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 
 public class GameModel {
 
     private final Array<Listener> listeners = new Array<>();
+    private final GridLoader gridLoader = new GridLoader();
 
     private Grid grid = Grid.NULL_OBJECT;
+    private boolean isNew = true;
 
     public void init() {
-        this.setGrid(createGrid());
+        this.setGrid(createEmptyGrid());
     }
 
-    private Grid createGrid() {
-        //TODO загрузка из json-а внешнего
+    public Grid createEmptyGrid() {
         Cell[][] cells = new Cell[8][8];
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -21,15 +24,24 @@ public class GameModel {
                 cell.setX(i);
                 cell.setY(j);
                 cell.setType(CellType.EMPTY);
-                if (i == j) {
-                    cell.setType(CellType.OUR_CELL);
-                }
-
                 cells[i][j] = cell;
             }
         }
-
         return new Grid(cells);
+    }
+
+    // "levels/level0.json"
+    public void loadGrid(String pathToLevel) {
+        FileHandle level = Gdx.files.local(pathToLevel);
+        Grid newGrid = gridLoader.toGrid(new String(level.readBytes()));
+        setNew(true);
+        setGrid(newGrid);
+    }
+
+    public void saveGrid(String levelName) {
+        String grid = gridLoader.fromGrid(this.grid);
+        FileHandle level = Gdx.files.local(levelName);
+        level.writeString(grid, false);
     }
 
     public Grid getGrid() {
@@ -111,4 +123,11 @@ public class GameModel {
         void update(GameModel model);
     }
 
+    public boolean isNew() {
+        return isNew;
+    }
+
+    public void setNew(boolean aNew) {
+        isNew = aNew;
+    }
 }

@@ -26,6 +26,11 @@ public class UiFsm {
         this.context = context;
     }
 
+    public void reset() {
+        deselectCurrentCells();
+        currentFsmState = UiFsmStateType.SELECT_CELL_FROM;
+    }
+
     public void handle(CellImage currentCell) {
         CellImageType type = currentCell.getType();
 

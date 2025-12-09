@@ -1,5 +1,6 @@
 package com.github.br.libgdx.jam35.ui;
 
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.github.br.libgdx.jam35.GameContext;
 import com.github.br.libgdx.jam35.model.Cell;
@@ -7,7 +8,6 @@ import com.github.br.libgdx.jam35.model.CellType;
 import com.github.br.libgdx.jam35.model.GameModel;
 
 public class GameFieldUi {
-
 
     private CellImage[][] cells;
 
@@ -70,6 +70,19 @@ public class GameFieldUi {
             return;
         }
         cell.setSelectType(CellImageType.NONE);
+    }
+
+    public void changeListener(ClickListener currentListener) {
+        if (cells == null) {
+            return;
+        }
+
+        for (CellImage[] column : cells) {
+            for (CellImage cellImage : column) {
+                cellImage.clearListeners();
+                cellImage.addListener(currentListener);
+            }
+        }
     }
 
 }

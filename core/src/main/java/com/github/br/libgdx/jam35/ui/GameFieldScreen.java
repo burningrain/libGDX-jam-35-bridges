@@ -7,12 +7,15 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.github.br.libgdx.jam35.GameContext;
 import com.github.br.libgdx.jam35.Res;
 import com.github.br.libgdx.jam35.model.Cell;
+import com.github.br.libgdx.jam35.model.CellType;
 import com.github.br.libgdx.jam35.model.GameModel;
 import com.github.br.libgdx.jam35.model.Grid;
 
@@ -24,20 +27,53 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
     private Skin skin;
 
     private final GameFieldUi gameFieldUi;
-    private final UiFsm fsm;
+    private final UiFsm runtimeFsm;
+
+    private GameType type;
 
     private final ClickListener cellListener = new ClickListener() {
         @Override
         public void clicked(InputEvent event, float x, float y) {
             CellImage currentCell = (CellImage) event.getTarget();
-            fsm.handle(currentCell);
+            runtimeFsm.handle(currentCell);
+        }
+    };
+    private final ClickListener editorListener = new ClickListener() {
+        @Override
+        public void clicked(InputEvent event, float x, float y) {
+            CellImage currentCell = (CellImage) event.getTarget();
+            Cell model = currentCell.getModel();
+            CellType currentType = model.getType();
+            switch (currentType) {
+                case EMPTY:
+                    currentType = CellType.OUR_CELL;
+                    break;
+                case OUR_CELL:
+                    currentType = CellType.ENEMY_CELL;
+                    break;
+                case ENEMY_CELL:
+                    currentType = CellType.EMPTY;
+                    break;
+            }
+
+            model.setType(currentType);
+            currentCell.setModelCellType(currentType);
         }
     };
 
-    public GameFieldScreen(GameContext context) {
+    public GameFieldScreen(GameContext context, GameType type) {
         this.context = context;
         this.gameFieldUi = new GameFieldUi();
-        this.fsm = new UiFsm(gameFieldUi, context);
+        this.runtimeFsm = new UiFsm(gameFieldUi, context);
+        changeMode(type);
+    }
+
+    public void changeMode(GameType type) {
+        runtimeFsm.reset();
+
+        ClickListener currentListener = (GameType.EDITOR == type) ? editorListener : cellListener;
+        gameFieldUi.changeListener(currentListener);
+        this.type = type;
     }
 
     @Override
@@ -47,7 +83,46 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
         update(context.getGameModel());
         context.getGameModel().addListener(this);
 
+        //TODO убрать в отдельный скрин позже
+        TextButton modeButton = createButton("RUNTIME", 950, 730);
+        modeButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                type = (GameType.EDITOR == type) ? GameType.RUNTIME : GameType.EDITOR;
+                String buttonText = (GameType.EDITOR == type) ? "RUNTIME" : "EDITOR";
+                modeButton.setText(buttonText);
+                changeMode(type);
+            }
+        });
+        stage.addActor(modeButton);
+
+        TextButton saveButton = createButton("SAVE", 950, 700);
+        saveButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                context.getGameModel().saveGrid("levels/level_1.json");
+            }
+        });
+        stage.addActor(saveButton);
+
+        TextButton loadButton = createButton("LOAD", 950, 670);
+        loadButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                context.getGameModel().loadGrid("levels/level_1.json");
+            }
+        });
+        stage.addActor(loadButton);
+        //TODO убрать в отедльный скрин позже
+
         Gdx.input.setInputProcessor(stage);
+    }
+
+    private TextButton createButton(String title, int x, int y) {
+        TextButton modeButton = new TextButton(title, skin);
+        modeButton.setX(x);
+        modeButton.setY(y);
+        return modeButton;
     }
 
     @Override
@@ -57,8 +132,10 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
             return;
         }
 
-        if (gameFieldUi.isEmpty()) {
+        if (model.isNew()) {
+            model.setNew(false);
             gameFieldUi.initGrid(createGrid(modelGrid));
+            changeMode(type);
         }
 
     }
@@ -95,7 +172,6 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
             new TextureRegion(assetManager.get(Res.FUTURE_CELL, Texture.class))
         );
         image.setPosition(x, y);
-        image.addListener(cellListener);
 
         return image;
     }
@@ -124,7 +200,6 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
 
     @Override
     public void hide() {
-
     }
 
     @Override

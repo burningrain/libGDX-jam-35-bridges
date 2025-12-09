@@ -4,11 +4,11 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.br.libgdx.jam35.model.GameModel;
 import com.github.br.libgdx.jam35.ui.GameFieldScreen;
+import com.github.br.libgdx.jam35.ui.GameType;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends Game {
@@ -24,7 +24,7 @@ public class Main extends Game {
 
         context.getGameModel().init();
 
-        gameFieldScreen = new GameFieldScreen(context);
+        gameFieldScreen = new GameFieldScreen(context, GameType.EDITOR);
         setScreen(gameFieldScreen);
     }
 
