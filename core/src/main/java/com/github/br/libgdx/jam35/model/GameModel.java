@@ -49,7 +49,7 @@ public class GameModel {
 
     //TODO вернуть массив передвижений для UI
     public void step(Cell from, Cell to) {
-        validator.validationStep(grid, from, to, playerManager.getCurrentPlayer().getPlayerType());
+        validator.validationStep(grid, from, to);
 
         //TODO игровая логика
         System.out.println("\nfrom [" + from.getX() + "; " + from.getY() + "], type [" + from.getType() + "]" +
@@ -57,7 +57,7 @@ public class GameModel {
     }
 
     public Array<Cell> getPossibleStepsForCell(Cell currentCell) {
-        return stepResolver.getPossibleStepsForCell(playerManager.getCurrentPlayer().getPlayerType(), grid, currentCell);
+        return stepResolver.getPossibleStepsForCell(grid, currentCell);
     }
 
     public boolean isNew() {

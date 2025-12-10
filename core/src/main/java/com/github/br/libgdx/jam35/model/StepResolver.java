@@ -11,47 +11,46 @@ public class StepResolver {
     }
 
     //TODO правильно вычислять возможные ячейки и ходы
-    public Array<Cell> getPossibleStepsForCell(PlayerType playerType, Grid grid, Cell currentCell) {
+    public Array<Cell> getPossibleStepsForCell(Grid grid, Cell currentCell) {
         Array<Cell> result = new Array<>();
 
         int currentX = currentCell.getX();
         int currentY = currentCell.getY();
-        Cell[][] cells = grid.getGrid();
 
-        Cell toCell;
         // налево
-        if (validator.isCellExist(grid, currentX - 1, currentY)) {
-            toCell = cells[currentX - 1][currentY];
-            if (validator.isAbleToStep(playerType, currentCell, toCell)) {
-                result.add(toCell);
-            }
-        }
-
+        addStepIfPossible(currentX - 1, currentY, grid, currentCell, result);
+        addJumpIfPossible(currentX - 2, currentY, grid, currentCell, result);
         // направо
-        if (validator.isCellExist(grid, currentX + 1, currentY)) {
-            toCell = cells[currentX + 1][currentY];
-            if (validator.isAbleToStep(playerType, currentCell, toCell)) {
-                result.add(toCell);
-            }
-        }
-
+        addStepIfPossible(currentX + 1, currentY, grid, currentCell, result);
+        addJumpIfPossible(currentX + 2, currentY, grid, currentCell, result);
         // вверх
-        if (validator.isCellExist(grid, currentX, currentY + 1)) {
-            toCell = cells[currentX][currentY + 1];
-            if (validator.isAbleToStep(playerType, currentCell, toCell)) {
-                result.add(toCell);
-            }
-        }
-
+        addStepIfPossible(currentX, currentY + 1, grid, currentCell, result);
+        addJumpIfPossible(currentX, currentY + 2, grid, currentCell, result);
         // вниз
-        if (validator.isCellExist(grid, currentX, currentY - 1)) {
-            toCell = cells[currentX][currentY - 1];
-            if (validator.isAbleToStep(playerType, currentCell, toCell)) {
-                result.add(toCell);
-            }
-        }
+        addStepIfPossible(currentX, currentY - 1, grid, currentCell, result);
+        addJumpIfPossible(currentX, currentY - 2, grid, currentCell, result);
 
         return result;
+    }
+
+    private void addStepIfPossible(int x, int y, Grid grid,
+                                   Cell currentCell, Array<Cell> result) {
+        if (!validator.isAbleToStep(grid, currentCell, x, y)) {
+            return;
+        }
+
+        Cell[][] cells = grid.getGrid();
+        result.add(cells[x][y]);
+    }
+
+    private void addJumpIfPossible(int x, int y, Grid grid,
+                                   Cell currentCell, Array<Cell> result) {
+        if (!validator.isAbleToJump(grid, currentCell, x, y)) {
+            return;
+        }
+
+        Cell[][] cells = grid.getGrid();
+        result.add(cells[x][y]);
     }
 
 }
