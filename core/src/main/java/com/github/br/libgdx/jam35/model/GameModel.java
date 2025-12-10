@@ -8,6 +8,9 @@ public class GameModel {
 
     private final Array<Listener> listeners = new Array<>();
     private final GridLoader gridLoader = new GridLoader();
+    private final Validator validator = new Validator();
+    private final StepResolver stepResolver = new StepResolver(validator);
+    private final PlayerManager playerManager = new PlayerManager();
 
     private Grid grid = Grid.NULL_OBJECT;
     private boolean isNew = true;
@@ -44,6 +47,27 @@ public class GameModel {
         level.writeString(grid, false);
     }
 
+    //TODO вернуть массив передвижений для UI
+    public void step(Cell from, Cell to) {
+        validator.validationStep(grid, from, to, playerManager.getCurrentPlayer().getPlayerType());
+
+        //TODO игровая логика
+        System.out.println("\nfrom [" + from.getX() + "; " + from.getY() + "], type [" + from.getType() + "]" +
+            "\nto [" + to.getX() + "; " + to.getY() + "], type [" + to.getType() + "]");
+    }
+
+    public Array<Cell> getPossibleStepsForCell(Cell currentCell) {
+        return stepResolver.getPossibleStepsForCell(playerManager.getCurrentPlayer().getPlayerType(), grid, currentCell);
+    }
+
+    public boolean isNew() {
+        return isNew;
+    }
+
+    public void setNew(boolean aNew) {
+        isNew = aNew;
+    }
+
     public Grid getGrid() {
         return grid;
     }
@@ -51,6 +75,19 @@ public class GameModel {
     public void setGrid(Grid grid) {
         this.grid = grid;
         notifyListeners();
+    }
+
+    public void addPlayer(Player player) {
+        playerManager.addPlayer(player);
+    }
+
+    public void start() {
+        playerManager.start();
+    }
+
+    // observer
+    public interface Listener {
+        void update(GameModel model);
     }
 
     public void addListener(Listener listener) {
@@ -71,63 +108,6 @@ public class GameModel {
             listener.update(this);
         }
     }
+    // observer
 
-    public void step(Cell from, Cell to) {
-        validationStep(from, to);
-
-        //TODO игровая логика
-        System.out.println("\nfrom [" + from.getX() + "; " + from.getY() + "], type [" + from.getType() + "]" +
-            "\nto [" + to.getX() + "; " + to.getY() + "], type [" + to.getType() + "]");
-    }
-
-    private void validationStep(Cell from, Cell to) {
-        CellType fromType = from.getType();
-        CellType toType = to.getType();
-        boolean isNeedTrowException = false;
-        if (!isAbleToStep(to.getX(), to.getY()) || from == to) {
-            isNeedTrowException = true;
-        } else if (CellType.OUR_CELL != fromType || CellType.EMPTY != toType) {
-            isNeedTrowException = true;
-        }
-
-        if (isNeedTrowException) {
-            throw new IllegalArgumentException(
-                "Incorrect step:" +
-                    "\nfrom [" + from.getX() + ";" + from.getY() + "], type [" + fromType + "]" +
-                    "\nto [" + to.getX() + "; " + to.getY() + "], type [" + toType + "]"
-            );
-        }
-    }
-
-    public boolean isAbleToStep(int toX, int toY) {
-        if (Grid.NULL_OBJECT == grid) {
-            return false;
-        }
-
-        Cell[][] cells = grid.getGrid();
-        int maxX = cells.length - 1;
-        int maxY = cells[0].length - 1;
-
-        if (toX < 0 || toX > maxX) {
-            return false;
-        }
-
-        if (toY < 0 || toY > maxY) {
-            return false;
-        }
-
-        return true;
-    }
-
-    public interface Listener {
-        void update(GameModel model);
-    }
-
-    public boolean isNew() {
-        return isNew;
-    }
-
-    public void setNew(boolean aNew) {
-        isNew = aNew;
-    }
 }

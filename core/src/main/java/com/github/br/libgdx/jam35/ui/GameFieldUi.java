@@ -21,37 +21,18 @@ public class GameFieldUi {
 
     public boolean isOurCell(CellImage currentCell) {
         Cell currentModel = currentCell.getModel();
-        return CellType.OUR_CELL == currentModel.getType();
+        return CellType.WHITE_CELL == currentModel.getType();
     }
 
     public void selectFutureCells(GameContext context, CellImage currentCell, Array<CellImage> selectedFutureStepCells) {
         GameModel gameModel = context.getGameModel();
         Cell cellModel = currentCell.getModel();
-        int currentX = cellModel.getX();
-        int currentY = cellModel.getY();
 
-        // налево
-        if (gameModel.isAbleToStep(currentX - 1, currentY)) {
-            selectedFutureStepCells.add(cells[currentX - 1][currentY]);
-        }
-
-        // направо
-        if (gameModel.isAbleToStep(currentX + 1, currentY)) {
-            selectedFutureStepCells.add(cells[currentX + 1][currentY]);
-        }
-
-        // вверх
-        if (gameModel.isAbleToStep(currentX, currentY + 1)) {
-            selectedFutureStepCells.add(cells[currentX][currentY + 1]);
-        }
-
-        // вниз
-        if (gameModel.isAbleToStep(currentX, currentY - 1)) {
-            selectedFutureStepCells.add(cells[currentX][currentY - 1]);
-        }
-
-        for (CellImage selectedFutureStepCell : selectedFutureStepCells) {
-            selectedFutureStepCell.setSelectType(CellImageType.FUTURE_STEP);
+        Array<Cell> stepsForCell = gameModel.getPossibleStepsForCell(cellModel);
+        for (Cell cell : stepsForCell) {
+            CellImage cellImage = cells[cell.getX()][cell.getY()];
+            cellImage.setSelectType(CellImageType.FUTURE_STEP);
+            selectedFutureStepCells.add(cellImage);
         }
     }
 

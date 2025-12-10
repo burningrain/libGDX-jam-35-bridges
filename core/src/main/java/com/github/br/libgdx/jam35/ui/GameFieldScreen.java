@@ -7,17 +7,13 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.github.br.libgdx.jam35.GameContext;
 import com.github.br.libgdx.jam35.Res;
-import com.github.br.libgdx.jam35.model.Cell;
-import com.github.br.libgdx.jam35.model.CellType;
-import com.github.br.libgdx.jam35.model.GameModel;
-import com.github.br.libgdx.jam35.model.Grid;
+import com.github.br.libgdx.jam35.model.*;
 
 public class GameFieldScreen implements Screen, GameModel.Listener {
 
@@ -46,12 +42,12 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
             CellType currentType = model.getType();
             switch (currentType) {
                 case EMPTY:
-                    currentType = CellType.OUR_CELL;
+                    currentType = CellType.WHITE_CELL;
                     break;
-                case OUR_CELL:
-                    currentType = CellType.ENEMY_CELL;
+                case WHITE_CELL:
+                    currentType = CellType.BLACK_CELL;
                     break;
-                case ENEMY_CELL:
+                case BLACK_CELL:
                     currentType = CellType.EMPTY;
                     break;
             }
@@ -80,8 +76,14 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
     public void show() {
         stage = new Stage(context.getViewport());
         skin = new Skin(Gdx.files.internal(Res.SKIN));
-        update(context.getGameModel());
-        context.getGameModel().addListener(this);
+
+        GameModel gameModel = context.getGameModel();
+        update(gameModel);
+
+        gameModel.addListener(this);
+        gameModel.addPlayer(new Player(1, PlayerType.WHITE, UserType.HUMAN));
+        gameModel.addPlayer(new Player(2, PlayerType.BLACK, UserType.COMPUTER));
+        gameModel.start();
 
         //TODO убрать в отдельный скрин позже
         TextButton modeButton = createButton("RUNTIME", 950, 730);

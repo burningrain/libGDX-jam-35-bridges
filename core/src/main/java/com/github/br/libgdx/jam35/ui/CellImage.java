@@ -60,10 +60,10 @@ public class CellImage extends Image {
             case EMPTY:
                 color = EMPTY_COLOR;
                 break;
-            case OUR_CELL:
+            case WHITE_CELL:
                 color = OUR_COLOR;
                 break;
-            case ENEMY_CELL:
+            case BLACK_CELL:
                 color = ENEMY_COLOR;
                 break;
         }

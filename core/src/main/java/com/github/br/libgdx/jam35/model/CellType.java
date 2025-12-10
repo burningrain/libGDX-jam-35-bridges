@@ -1,10 +1,11 @@
 package com.github.br.libgdx.jam35.model;
 
+//TODO удалить понятие CellType и ввести понятие, что чейка занята юнитом игрока
 public enum CellType {
 
     EMPTY,
-    OUR_CELL,
-    ENEMY_CELL
+    WHITE_CELL,
+    BLACK_CELL
     ;
 
 }
