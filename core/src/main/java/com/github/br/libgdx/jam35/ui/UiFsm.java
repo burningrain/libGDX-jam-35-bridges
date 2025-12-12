@@ -5,6 +5,7 @@ import com.github.br.libgdx.jam35.GameContext;
 import com.github.br.libgdx.jam35.model.Cell;
 import com.github.br.libgdx.jam35.model.GameModel;
 import com.github.br.libgdx.jam35.model.Player;
+import com.github.br.libgdx.jam35.model.Step;
 
 public class UiFsm {
 

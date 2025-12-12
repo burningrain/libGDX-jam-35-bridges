@@ -6,6 +6,7 @@ import com.github.br.libgdx.jam35.GameContext;
 import com.github.br.libgdx.jam35.model.Cell;
 import com.github.br.libgdx.jam35.model.GameModel;
 import com.github.br.libgdx.jam35.model.Player;
+import com.github.br.libgdx.jam35.model.WasJump;
 
 public class GameFieldUi {
 
@@ -19,6 +20,15 @@ public class GameFieldUi {
         this.cells = cells;
     }
 
+    public void updateGrid() {
+        for (CellImage[] row : cells) {
+            for (CellImage cellImage : row) {
+                Cell model = cellImage.getModel();
+                cellImage.setPlayerColor(model.getPlayer());
+            }
+        }
+    }
+
     public boolean isOurCell(CellImage currentCell, Player playerWhoDoStep) {
         Cell currentModel = currentCell.getModel();
         return playerWhoDoStep == currentModel.getPlayer();
@@ -28,7 +38,7 @@ public class GameFieldUi {
         GameModel gameModel = context.getGameModel();
         Cell cellModel = currentCell.getModel();
 
-        Array<Cell> stepsForCell = gameModel.getPossibleStepsForCell(cellModel);
+        Array<Cell> stepsForCell = gameModel.getPossibleStepsForCell(cellModel, new WasJump());
         for (Cell cell : stepsForCell) {
             CellImage cellImage = cells[cell.getX()][cell.getY()];
             cellImage.setSelectType(CellImageType.FUTURE_STEP);

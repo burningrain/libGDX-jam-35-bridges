@@ -11,7 +11,7 @@ public class StepResolver {
     }
 
     //TODO правильно вычислять возможные ячейки и ходы
-    public Array<Cell> getPossibleStepsForCell(Grid grid, Cell currentCell) {
+    public Array<Cell> getPossibleStepsForCell(Grid grid, Cell currentCell, WasJump wasJump) {
         Array<Cell> result = new Array<>();
 
         int currentX = currentCell.getX();
@@ -22,7 +22,26 @@ public class StepResolver {
         boolean isJumpRight = addJumpIfPossible(currentX + 2, currentY, grid, currentCell, result); // направо
         boolean isJumpUp = addJumpIfPossible(currentX, currentY + 2, grid, currentCell, result); // вверх
         boolean isJumpDown = addJumpIfPossible(currentX, currentY - 2, grid, currentCell, result); // вниз
-        if (isJumpLeft || isJumpRight || isJumpUp || isJumpDown) {
+
+        Cell[][] cells = grid.getGrid();
+        if (isJumpLeft) {
+            wasJump.wasJump = true;
+            wasJump.midCell = cells[currentX - 1][currentY];
+            return result;
+        }
+        if (isJumpRight) {
+            wasJump.wasJump = true;
+            wasJump.midCell = cells[currentX + 1][currentY];
+            return result;
+        }
+        if (isJumpUp) {
+            wasJump.wasJump = true;
+            wasJump.midCell = cells[currentX][currentY + 1];
+            return result;
+        }
+        if (isJumpDown) {
+            wasJump.wasJump = true;
+            wasJump.midCell = cells[currentX][currentY - 1];
             return result;
         }
 

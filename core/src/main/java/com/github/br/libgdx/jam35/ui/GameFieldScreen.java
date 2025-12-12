@@ -87,8 +87,8 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
         gameModel.addListener(this);
 
         // TODO убрать куда-нибудь
-        gameModel.addPlayer(new Player(0, PlayerColorType.WHITE, UserType.HUMAN));
-        gameModel.addPlayer(new Player(1, PlayerColorType.BLACK, UserType.COMPUTER));
+        gameModel.addPlayer(PlayerColorType.WHITE, UserType.HUMAN);
+        gameModel.addPlayer(PlayerColorType.BLACK, UserType.COMPUTER);
         gameModel.setCurrentPlayer(0);
         gameModel.start();
 
@@ -145,6 +145,8 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
             model.setNew(false);
             gameFieldUi.initGrid(createGrid(modelGrid));
             changeMode(type);
+        } else {
+            gameFieldUi.updateGrid();
         }
 
     }

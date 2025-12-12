@@ -6,9 +6,11 @@ public class Player {
 
     public static final Player NO_PLAYER = null;
 
-    private final int id;
-    private final PlayerColorType playerColorType;
-    private final UserType userType;
+    private int id;
+    private PlayerColorType playerColorType;
+    private UserType userType;
+
+    public Player(){}
 
     public Player(int id, PlayerColorType playerColorType, UserType userType) {
         this.id = id;
@@ -28,6 +30,22 @@ public class Player {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setPlayerColorType(PlayerColorType playerColorType) {
+        this.playerColorType = playerColorType;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
+    }
+
+    public PlayerColorType getPlayerColorType() {
+        return playerColorType;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -40,4 +58,14 @@ public class Player {
     public int hashCode() {
         return Objects.hash(id, playerColorType, userType);
     }
+
+    @Override
+    public String toString() {
+        return "Player{" +
+            "id=" + id +
+            ", playerColorType=" + playerColorType +
+            ", userType=" + userType +
+            '}';
+    }
+
 }

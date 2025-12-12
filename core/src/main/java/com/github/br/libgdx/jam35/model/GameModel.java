@@ -2,6 +2,7 @@ package com.github.br.libgdx.jam35.model;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 
 public class GameModel {
@@ -15,6 +16,8 @@ public class GameModel {
     private Grid grid = Grid.NULL_OBJECT;
     private boolean isNew = true;
 
+    private final Array<Step> currentSteps = new Array<>();
+
     public void init() {
         this.setGrid(createEmptyGrid());
     }
@@ -23,6 +26,11 @@ public class GameModel {
         playerManager.setCurrentPlayer(0);
         playerManager.start();
     }
+
+    public boolean isEnd() {
+        return playerManager.getWinner() != null;
+    }
+
 
     public Grid createEmptyGrid() {
         Cell[][] cells = new Cell[8][8];
@@ -52,17 +60,113 @@ public class GameModel {
         level.writeString(grid, false);
     }
 
-    //TODO вернуть массив передвижений для UI
     public void step(Cell from, Cell to) {
         validator.validationStep(grid, from, to);
 
-        //TODO игровая логика
-        System.out.println("\nfrom [" + from.getX() + "; " + from.getY() + "], type [" + from.getPlayer() + "]" +
-            "\nto [" + to.getX() + "; " + to.getY() + "], type [" + to.getPlayer() + "]");
+        // todo не забыть удалить
+        String stepLog = "\nfrom [" + from.getX() + "; " + from.getY() + "], type [" + from.getPlayer() + "]" +
+            "\nto [" + to.getX() + "; " + to.getY() + "], type [" + to.getPlayer() + "]";
+        System.out.println(stepLog);
+
+        WasJump wasJump = new WasJump();
+        Array<Cell> possibleStepsForCell = getPossibleStepsForCell(from, wasJump);
+        // проверяем, что сходили куда можно сходить
+        if (!possibleStepsForCell.contains(to, true)) {
+            throw new IllegalArgumentException("incorrect to=[" + to.getX() + "; " + to.getY() + "], type [" + to.getPlayer() + "]");
+        }
+
+        Player currentPlayer = playerManager.getCurrentPlayer();
+        boolean isNeedJump = isNeedToJump(grid, currentPlayer);
+        if (isNeedJump && !wasJump.wasJump) {
+            // если прыгать нужно, а не прыгнули, значит ошибка
+            throw new IllegalArgumentException("need to jump");
+        }
+
+        currentSteps.add(new Step(currentPlayer, from.copy(), to.copy()));
+        from.setPlayer(Player.NO_PLAYER);
+        to.setPlayer(currentPlayer);
+        if (wasJump.wasJump) {
+            wasJump.midCell.setPlayer(Player.NO_PLAYER);
+        }
+        notifyListeners();
+
+        // если был прыжок, то смотрим следующий ход - прыжок или нет
+        // если прыжок, мы в середине удара находимся
+        if (wasJump.wasJump) {
+            isNeedJump = isNeedToJump(grid, currentPlayer);
+            if (isNeedJump) {
+                // если идет удар, то ход не переходит к следующему игроку
+                // а текущий продолжает свой удар
+                return;
+            }
+        }
+
+
+        // иначе переходим к следующему игроку
+        playerManager.goToNextPlayer();
+        Player nextPlayer = playerManager.getCurrentPlayer();
+        while (UserType.COMPUTER == nextPlayer.getUserType()) {
+            calculateComputerStep(nextPlayer);
+            nextPlayer = playerManager.getCurrentPlayer();
+        }
     }
 
-    public Array<Cell> getPossibleStepsForCell(Cell currentCell) {
-        return stepResolver.getPossibleStepsForCell(grid, currentCell);
+    private boolean isNeedToJump(Grid grid, Player currentPlayer) {
+        Array<ComputerStepVariants> variants = getVariants(grid, currentPlayer);
+        for (ComputerStepVariants variant : variants) {
+            if (variant.getWasJump().wasJump) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void calculateComputerStep(Player player) {
+        Array<ComputerStepVariants> variants = getVariants(grid, player);
+
+        Cell from = null;
+        Cell to = null;
+        boolean isStepCalculated = false;
+        for (ComputerStepVariants variant : variants) {
+            if (variant.getWasJump().wasJump) {
+                from = variant.getCell();
+                to = variant.getPossibleSteps().get(0);
+                isStepCalculated = true;
+                break;
+            }
+        }
+        if (!isStepCalculated) {
+            int stepIndex = MathUtils.random.nextInt(variants.size - 1);
+            ComputerStepVariants computerStepVariant = variants.get(stepIndex);
+
+            Array<Cell> possibleSteps = computerStepVariant.getPossibleSteps();
+            int toIndex = MathUtils.random.nextInt(possibleSteps.size - 1);
+            from = computerStepVariant.getCell();
+            to = possibleSteps.get(toIndex);
+        }
+
+        step(from, to);
+    }
+
+    private Array<ComputerStepVariants> getVariants(Grid grid, Player me) {
+        Array<ComputerStepVariants> variants = new Array<>();
+        Cell[][] cells = grid.getGrid();
+        for (int x = 0; x < cells.length; x++) {
+            for (int y = 0; y < cells[0].length; y++) {
+                Cell cell = cells[x][y];
+                if (cell.getPlayer() != me) {
+                    continue;
+                }
+                WasJump wasJump = new WasJump();
+                Array<Cell> possibleSteps = getPossibleStepsForCell(cell, wasJump);
+                variants.add(new ComputerStepVariants(cell, possibleSteps, wasJump));
+            }
+        }
+        return variants;
+    }
+
+    public Array<Cell> getPossibleStepsForCell(Cell currentCell, WasJump wasJump) {
+        return stepResolver.getPossibleStepsForCell(grid, currentCell, wasJump);
     }
 
     public boolean isNew() {
@@ -82,8 +186,8 @@ public class GameModel {
         notifyListeners();
     }
 
-    public void addPlayer(Player player) {
-        playerManager.addPlayer(player);
+    public void addPlayer(PlayerColorType playerColorType, UserType userType) {
+        playerManager.addPlayer(playerColorType, userType);
     }
 
     public void setCurrentPlayer(int playerNumber) {
@@ -125,6 +229,13 @@ public class GameModel {
             listener.update(this);
         }
     }
-    // observer
+// observer
+
+
+    public Array<Step> pollCurrentSteps() {
+        Array<Step> result = new Array<>(currentSteps);
+        currentSteps.clear();
+        return result;
+    }
 
 }

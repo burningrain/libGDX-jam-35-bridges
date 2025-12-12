@@ -4,25 +4,35 @@ import com.badlogic.gdx.utils.Array;
 
 public class PlayerManager {
 
-    private Array<Player> players = new Array<>();
+    private final Array<Player> players = new Array<>();
+
     private Player currentPlayer;
+    private int currentPlayerNumber = 0;
 
     private Player winner;
 
-    public void addPlayer(Player player) {
-        players.add(player);
+    public void goToNextPlayer() {
+        int nextPlayer = currentPlayerNumber + 1;
+        if (nextPlayer == players.size) {
+            currentPlayerNumber = 0;
+        } else {
+            currentPlayerNumber++;
+        }
+        setCurrentPlayer(currentPlayerNumber);
     }
 
-    public void deletePlayer(Player player) {
-        players.add(player);
+    public void addPlayer(PlayerColorType playerColorType, UserType userType) {
+        players.add(new Player(currentPlayerNumber, playerColorType, userType));
+        currentPlayerNumber++;
     }
 
-    public void setCurrentPlayer(Player currentPlayer) {
-        this.currentPlayer = currentPlayer;
+    public void deletePlayer(int number) {
+        players.removeIndex(number);
     }
 
     public void setCurrentPlayer(int number) {
         this.currentPlayer = players.get(number);
+        this.currentPlayerNumber = number;
     }
 
     public Player getWinner() {
@@ -48,6 +58,7 @@ public class PlayerManager {
 
     public void clear() {
         currentPlayer = null;
+        winner = null;
         players.clear();
     }
 
