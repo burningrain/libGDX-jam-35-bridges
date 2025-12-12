@@ -4,8 +4,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.github.br.libgdx.jam35.GameContext;
 import com.github.br.libgdx.jam35.model.Cell;
-import com.github.br.libgdx.jam35.model.CellType;
 import com.github.br.libgdx.jam35.model.GameModel;
+import com.github.br.libgdx.jam35.model.Player;
 
 public class GameFieldUi {
 
@@ -19,9 +19,9 @@ public class GameFieldUi {
         this.cells = cells;
     }
 
-    public boolean isOurCell(CellImage currentCell) {
+    public boolean isOurCell(CellImage currentCell, Player playerWhoDoStep) {
         Cell currentModel = currentCell.getModel();
-        return CellType.WHITE_CELL == currentModel.getType();
+        return playerWhoDoStep == currentModel.getPlayer();
     }
 
     public void selectFutureCells(GameContext context, CellImage currentCell, Array<CellImage> selectedFutureStepCells) {

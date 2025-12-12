@@ -3,7 +3,7 @@ package com.github.br.libgdx.jam35.model;
 public class Cell {
 
     private int x, y;
-    private CellType type;
+    private Player player;
 
     public int getX() {
         return x;
@@ -21,12 +21,12 @@ public class Cell {
         this.y = y;
     }
 
-    public CellType getType() {
-        return type;
+    public Player getPlayer() {
+        return player;
     }
 
-    public void setType(CellType type) {
-        this.type = type;
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 
 }

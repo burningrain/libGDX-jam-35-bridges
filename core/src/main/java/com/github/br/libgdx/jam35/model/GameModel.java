@@ -19,6 +19,11 @@ public class GameModel {
         this.setGrid(createEmptyGrid());
     }
 
+    public void start() {
+        playerManager.setCurrentPlayer(0);
+        playerManager.start();
+    }
+
     public Grid createEmptyGrid() {
         Cell[][] cells = new Cell[8][8];
         for (int i = 0; i < 8; i++) {
@@ -26,7 +31,7 @@ public class GameModel {
                 Cell cell = new Cell();
                 cell.setX(i);
                 cell.setY(j);
-                cell.setType(CellType.EMPTY);
+                cell.setPlayer(Player.NO_PLAYER);
                 cells[i][j] = cell;
             }
         }
@@ -52,8 +57,8 @@ public class GameModel {
         validator.validationStep(grid, from, to);
 
         //TODO игровая логика
-        System.out.println("\nfrom [" + from.getX() + "; " + from.getY() + "], type [" + from.getType() + "]" +
-            "\nto [" + to.getX() + "; " + to.getY() + "], type [" + to.getType() + "]");
+        System.out.println("\nfrom [" + from.getX() + "; " + from.getY() + "], type [" + from.getPlayer() + "]" +
+            "\nto [" + to.getX() + "; " + to.getY() + "], type [" + to.getPlayer() + "]");
     }
 
     public Array<Cell> getPossibleStepsForCell(Cell currentCell) {
@@ -81,8 +86,20 @@ public class GameModel {
         playerManager.addPlayer(player);
     }
 
-    public void start() {
-        playerManager.start();
+    public void setCurrentPlayer(int playerNumber) {
+        playerManager.setCurrentPlayer(playerNumber);
+    }
+
+    public Player getCurrentPlayer() {
+        return playerManager.getCurrentPlayer();
+    }
+
+    public int getPlayersCount() {
+        return playerManager.getPlayersCount();
+    }
+
+    public Player getPlayer(int playerId) {
+        return playerManager.getPlayer(playerId);
     }
 
     // observer

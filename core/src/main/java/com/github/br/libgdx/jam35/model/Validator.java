@@ -3,12 +3,12 @@ package com.github.br.libgdx.jam35.model;
 public class Validator {
 
     public void validationStep(Grid grid, Cell from, Cell to) {
-        CellType fromType = from.getType();
-        CellType toType = to.getType();
+        Player fromType = from.getPlayer();
+        Player toType = to.getPlayer();
         boolean isNeedTrowException = false;
         if (!isCellExist(grid, to.getX(), to.getY()) || !isAbleToStep(grid, from, to.getX(), to.getY())) {
             isNeedTrowException = true;
-        } else if (CellType.EMPTY == fromType || CellType.EMPTY != toType) {
+        } else if (Player.NO_PLAYER == fromType || Player.NO_PLAYER != toType) {
             isNeedTrowException = true;
         }
 
@@ -42,7 +42,7 @@ public class Validator {
     }
 
     public boolean isAbleToStep(Grid grid, Cell currentCell, int x, int y) {
-        if (CellType.EMPTY == currentCell.getType()) {
+        if (Player.NO_PLAYER == currentCell.getPlayer()) {
             return false;
         }
         if (!isCellExist(grid, x, y)) {
@@ -52,14 +52,14 @@ public class Validator {
         Cell[][] cells = grid.getGrid();
         Cell toCell = cells[x][y];
 
-        CellType fromType = currentCell.getType();
-        CellType toType = toCell.getType();
+        Player fromType = currentCell.getPlayer();
+        Player toType = toCell.getPlayer();
 
-        return CellType.EMPTY != fromType && CellType.EMPTY == toType;
+        return Player.NO_PLAYER != fromType && Player.NO_PLAYER == toType;
     }
 
     public boolean isAbleToJump(Grid grid, Cell currentCell, int x, int y) {
-        if (CellType.EMPTY == currentCell.getType()) {
+        if (Player.NO_PLAYER == currentCell.getPlayer()) {
             return false;
         }
         if (!isCellExist(grid, x, y)) {
@@ -70,15 +70,15 @@ public class Validator {
         Cell toCell = cells[x][y];
 
         Cell midCell = getMidCell(currentCell, toCell, cells);
-        if (CellType.EMPTY != toCell.getType()) {
+        if (Player.NO_PLAYER != toCell.getPlayer()) {
             return false;
         }
 
-        if (CellType.EMPTY == midCell.getType()) {
+        if (Player.NO_PLAYER == midCell.getPlayer()) {
             return false;
         }
 
-        return currentCell.getType() != midCell.getType();
+        return currentCell.getPlayer() != midCell.getPlayer();
     }
 
     private static Cell getMidCell(Cell currentCell, Cell toCell, Cell[][] cells) {

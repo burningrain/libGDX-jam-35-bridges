@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.github.br.libgdx.jam35.GameContext;
 import com.github.br.libgdx.jam35.model.Cell;
 import com.github.br.libgdx.jam35.model.GameModel;
+import com.github.br.libgdx.jam35.model.Player;
 
 public class UiFsm {
 
@@ -34,25 +35,27 @@ public class UiFsm {
     public void handle(CellImage currentCell) {
         CellImageType type = currentCell.getType();
 
+        GameModel gameModel = context.getGameModel();
+        Player currentPlayer = gameModel.getCurrentPlayer();
         if (currentFsmState == UiFsmStateType.SELECT_CELL_FROM) {
-            selectCellFromAction(currentCell, type);
+            selectCellFromAction(currentCell, type, currentPlayer);
         } else if (currentFsmState == UiFsmStateType.SELECT_CELL_TO) {
             switch (type) {
                 case NONE:
-                    selectCellFromAction(currentCell, type);
+                    selectCellFromAction(currentCell, type, currentPlayer);
                     break;
                 case SELECTED:
                     deselectCurrentSelectedCellAction();
                     break;
                 case FUTURE_STEP:
-                    doStep(currentCell);
+                    doStep(currentCell, currentPlayer);
                     break;
             }
         }
     }
 
-    private void doStep(CellImage to) {
-        if (gameFieldUi.isOurCell(to)) {
+    private void doStep(CellImage to, Player currentPlayer) {
+        if (gameFieldUi.isOurCell(to, currentPlayer)) {
             return;
         }
 
@@ -72,9 +75,9 @@ public class UiFsm {
         currentFsmState = UiFsmStateType.SELECT_CELL_FROM;
     }
 
-    private void selectCellFromAction(CellImage currentCell, CellImageType type) {
+    private void selectCellFromAction(CellImage currentCell, CellImageType type, Player currentPlayer) {
         // валидация
-        if (!gameFieldUi.isOurCell(currentCell)) {
+        if (!gameFieldUi.isOurCell(currentCell, currentPlayer)) {
             return;
         }
         if (type != CellImageType.NONE) {

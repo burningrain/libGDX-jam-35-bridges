@@ -38,22 +38,26 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
         @Override
         public void clicked(InputEvent event, float x, float y) {
             CellImage currentCell = (CellImage) event.getTarget();
-            Cell model = currentCell.getModel();
-            CellType currentType = model.getType();
-            switch (currentType) {
-                case EMPTY:
-                    currentType = CellType.WHITE_CELL;
-                    break;
-                case WHITE_CELL:
-                    currentType = CellType.BLACK_CELL;
-                    break;
-                case BLACK_CELL:
-                    currentType = CellType.EMPTY;
-                    break;
+            Cell cellModel = currentCell.getModel();
+
+            GameModel gameModel = context.getGameModel();
+            int playersCount = gameModel.getPlayersCount();
+            int playerId;
+            Player player = cellModel.getPlayer();
+            if (player == Player.NO_PLAYER) {
+                playerId = -1;
+            } else {
+                playerId = player.getId();
             }
 
-            model.setType(currentType);
-            currentCell.setModelCellType(currentType);
+            if (playerId == (playersCount - 1)) {
+                playerId = -1;
+            } else {
+                playerId++;
+            }
+
+            cellModel.setPlayer((playerId == -1) ? Player.NO_PLAYER : gameModel.getPlayer(playerId));
+            currentCell.setPlayerColor(cellModel.getPlayer());
         }
     };
 
@@ -81,8 +85,11 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
         update(gameModel);
 
         gameModel.addListener(this);
-        gameModel.addPlayer(new Player(1, PlayerType.WHITE, UserType.HUMAN));
-        gameModel.addPlayer(new Player(2, PlayerType.BLACK, UserType.COMPUTER));
+
+        // TODO убрать куда-нибудь
+        gameModel.addPlayer(new Player(0, PlayerColorType.WHITE, UserType.HUMAN));
+        gameModel.addPlayer(new Player(1, PlayerColorType.BLACK, UserType.COMPUTER));
+        gameModel.setCurrentPlayer(0);
         gameModel.start();
 
         //TODO убрать в отдельный скрин позже

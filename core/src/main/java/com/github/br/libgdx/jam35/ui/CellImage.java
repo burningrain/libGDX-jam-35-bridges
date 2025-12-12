@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.github.br.libgdx.jam35.model.Cell;
-import com.github.br.libgdx.jam35.model.CellType;
+import com.github.br.libgdx.jam35.model.Player;
 
 public class CellImage extends Image {
 
@@ -29,7 +29,7 @@ public class CellImage extends Image {
         this.selected = selected;
         this.futureStep = futureStep;
 
-        this.setModelCellType(model.getType());
+        this.setPlayerColor(model.getPlayer());
     }
 
     public void setSelectType(CellImageType type) {
@@ -54,19 +54,21 @@ public class CellImage extends Image {
         ((TextureRegionDrawable) getDrawable()).setRegion(region);
     }
 
-    public void setModelCellType(CellType type) {
+    public void setPlayerColor(Player player) {
         Color color = null;
-        switch (type) {
-            case EMPTY:
-                color = EMPTY_COLOR;
-                break;
-            case WHITE_CELL:
-                color = OUR_COLOR;
-                break;
-            case BLACK_CELL:
-                color = ENEMY_COLOR;
-                break;
+        if (player == null) {
+            color = EMPTY_COLOR;
+        } else {
+            switch (player.getPlayerType()) {
+                case WHITE:
+                    color = OUR_COLOR;
+                    break;
+                case BLACK:
+                    color = ENEMY_COLOR;
+                    break;
+            }
         }
+
         setColor(color);
     }
 
