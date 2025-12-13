@@ -1,8 +1,11 @@
 package com.github.br.libgdx.jam35.model;
 
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
+
 import java.util.Objects;
 
-public class Player {
+public class Player implements Json.Serializable {
 
     public static final Player NULL_PLAYER = null;
 
@@ -66,6 +69,21 @@ public class Player {
             ", playerColorType=" + playerColorType +
             ", userType=" + userType +
             '}';
+    }
+
+    @Override
+    public void write(Json json) {
+        json.writeValue("id", id);
+        json.writeValue("playerColorType", playerColorType);
+        json.writeValue("userType", userType);
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        this.id = json.readValue("id", int.class, 0, jsonData);
+
+        this.playerColorType = json.readValue("playerColorType", PlayerColorType.class, jsonData);
+        this.userType = json.readValue("userType", UserType.class, jsonData);
     }
 
 }

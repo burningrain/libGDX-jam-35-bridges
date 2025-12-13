@@ -93,6 +93,10 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
         } else if (GameType.RUNTIME == this.type) {
             showRuntime();
         }
+
+        int currentWidth = Gdx.graphics.getWidth();
+        int currentHeight = Gdx.graphics.getHeight();
+        resize(currentWidth, currentHeight);
     }
 
     public void changeMode(GameType type) {

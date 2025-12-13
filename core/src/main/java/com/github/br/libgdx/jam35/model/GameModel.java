@@ -48,7 +48,7 @@ public class GameModel {
     }
 
     public void loadGrid(String pathToLevel) {
-        FileHandle level = Gdx.files.local(pathToLevel);
+        FileHandle level = Gdx.files.internal(pathToLevel);
         Grid newGrid = gridLoader.toGrid(new String(level.readBytes()));
         setNew(true);
         setGrid(newGrid);
@@ -56,7 +56,7 @@ public class GameModel {
 
     public void saveGrid(String levelName) {
         String grid = gridLoader.fromGrid(this.grid);
-        FileHandle level = Gdx.files.local(levelName);
+        FileHandle level = Gdx.files.internal(levelName);
         level.writeString(grid, false);
     }
 

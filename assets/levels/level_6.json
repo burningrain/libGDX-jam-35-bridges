@@ -6,21 +6,17 @@
         "y": 1
       },
       {
-        "y": 2,
+        "y": 2
+      },
+      {
+        "y": 3,
         "player": {
           "playerColorType": "WHITE",
           "userType": "HUMAN"
         }
       },
       {
-        "y": 3
-      },
-      {
-        "y": 4,
-        "player": {
-          "playerColorType": "WHITE",
-          "userType": "HUMAN"
-        }
+        "y": 4
       },
       {
         "y": 5
@@ -38,11 +34,7 @@
       },
       {
         "x": 1,
-        "y": 1,
-        "player": {
-          "playerColorType": "WHITE",
-          "userType": "HUMAN"
-        }
+        "y": 1
       },
       {
         "x": 1,
@@ -50,31 +42,28 @@
       },
       {
         "x": 1,
-        "y": 3
-      },
-      {
-        "x": 1,
-        "y": 4,
+        "y": 3,
         "player": {
           "playerColorType": "WHITE",
           "userType": "HUMAN"
         }
+      },
+      {
+        "x": 1,
+        "y": 4
       },
       {
         "x": 1,
         "y": 5,
         "player": {
-          "playerColorType": "WHITE",
-          "userType": "HUMAN"
+          "id": 1,
+          "playerColorType": "BLACK",
+          "userType": "COMPUTER"
         }
       },
       {
         "x": 1,
-        "y": 6,
-        "player": {
-          "playerColorType": "WHITE",
-          "userType": "HUMAN"
-        }
+        "y": 6
       },
       {
         "x": 1,
@@ -104,33 +93,27 @@
       },
       {
         "x": 2,
-        "y": 2,
-        "player": {
-          "id": 1,
-          "playerColorType": "BLACK",
-          "userType": "COMPUTER"
-        }
+        "y": 2
       },
       {
         "x": 2,
         "y": 3,
         "player": {
-          "id": 1,
-          "playerColorType": "BLACK",
-          "userType": "COMPUTER"
+          "playerColorType": "WHITE",
+          "userType": "HUMAN"
         }
       },
       {
         "x": 2,
-        "y": 4
-      },
-      {
-        "x": 2,
-        "y": 5,
+        "y": 4,
         "player": {
           "playerColorType": "WHITE",
           "userType": "HUMAN"
         }
+      },
+      {
+        "x": 2,
+        "y": 5
       },
       {
         "x": 2,
@@ -155,7 +138,11 @@
       },
       {
         "x": 3,
-        "y": 3
+        "y": 3,
+        "player": {
+          "playerColorType": "WHITE",
+          "userType": "HUMAN"
+        }
       },
       {
         "x": 3,
@@ -171,7 +158,11 @@
       },
       {
         "x": 3,
-        "y": 7
+        "y": 7,
+        "player": {
+          "playerColorType": "WHITE",
+          "userType": "HUMAN"
+        }
       }
     ],
     [
@@ -212,9 +203,8 @@
         "x": 4,
         "y": 6,
         "player": {
-          "id": 1,
-          "playerColorType": "BLACK",
-          "userType": "COMPUTER"
+          "playerColorType": "WHITE",
+          "userType": "HUMAN"
         }
       },
       {
@@ -249,7 +239,11 @@
       },
       {
         "x": 5,
-        "y": 5
+        "y": 5,
+        "player": {
+          "playerColorType": "WHITE",
+          "userType": "HUMAN"
+        }
       },
       {
         "x": 5,
@@ -262,11 +256,7 @@
     ],
     [
       {
-        "x": 6,
-        "player": {
-          "playerColorType": "WHITE",
-          "userType": "HUMAN"
-        }
+        "x": 6
       },
       {
         "x": 6,
@@ -300,12 +290,7 @@
       },
       {
         "x": 6,
-        "y": 6,
-        "player": {
-          "id": 1,
-          "playerColorType": "BLACK",
-          "userType": "COMPUTER"
-        }
+        "y": 6
       },
       {
         "x": 6,
@@ -314,11 +299,7 @@
     ],
     [
       {
-        "x": 7,
-        "player": {
-          "playerColorType": "WHITE",
-          "userType": "HUMAN"
-        }
+        "x": 7
       },
       {
         "x": 7,
@@ -338,12 +319,7 @@
       },
       {
         "x": 7,
-        "y": 5,
-        "player": {
-          "id": 1,
-          "playerColorType": "BLACK",
-          "userType": "COMPUTER"
-        }
+        "y": 5
       },
       {
         "x": 7,

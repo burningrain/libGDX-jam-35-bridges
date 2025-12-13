@@ -1,8 +1,9 @@
 package com.github.br.libgdx.jam35.model;
 
-import java.io.Serializable;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 
-public class Grid implements Serializable {
+public class Grid implements Json.Serializable {
 
     public static final Grid NULL_OBJECT = new Grid(new Cell[0][0]);
 
@@ -21,6 +22,16 @@ public class Grid implements Serializable {
 
     public void setGrid(Cell[][] grid) {
         this.grid = grid;
+    }
+
+    @Override
+    public void write(Json json) {
+        json.writeValue("grid", grid, Cell[][].class);
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        this.grid = json.readValue("grid", Cell[][].class, jsonData);
     }
 
 }
