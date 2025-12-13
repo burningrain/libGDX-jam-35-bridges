@@ -75,7 +75,7 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
 
     public GameFieldScreen(GameContext context, GameType type) {
         this.context = context;
-        this.gameFieldUi = new GameFieldUi();
+        this.gameFieldUi = new GameFieldUi(context);
         this.runtimeFsm = new UiFsm(gameFieldUi, context);
         this.type = type;
 
@@ -176,8 +176,8 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
     }
 
     private Label createLevelLabel() {
-        int width = Gdx.graphics.getWidth();
-        int height = Gdx.graphics.getHeight();
+        float width = stage.getViewport().getWorldWidth();
+        float height = stage.getViewport().getWorldHeight();
         float leftX = width / 2f - 22f;
         float leftY = height + PADDING_UP * 3.2f;
         Label levelLabel = new Label(LEVEL_TEXT, skin);
@@ -204,7 +204,7 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
         // инициализация нового уровня / новой игры
         if (model.isNew()) {
             model.setNew(false);
-            gameFieldUi.initGrid(createGrid(modelGrid));
+            gameFieldUi.initGrid(PADDING_UP, stage, modelGrid);
             changeMode(type);
             return;
         }
@@ -241,42 +241,6 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
 
     }
 
-    private CellImage[][] createGrid(Grid modelGrid) {
-        Cell[][] grid = modelGrid.getGrid();
-
-        int paddingRight = 20;
-        int width = Gdx.graphics.getWidth();
-        int height = Gdx.graphics.getHeight();
-
-        float cellSize = 64 + paddingRight;
-        float leftX = (width - cellSize * grid.length + paddingRight) / 2f;
-        float leftY = PADDING_UP + (height - cellSize * grid[0].length + paddingRight) / 2f;
-
-        CellImage[][] result = new CellImage[grid.length][grid[0].length];
-        for (int i = 0; i < grid.length; i++) {
-            for (int j = 0; j < grid[i].length; j++) {
-                CellImage image = createCell(grid[i][j], leftX + i * cellSize, leftY + j * cellSize);
-                stage.addActor(image);
-                result[i][j] = image;
-            }
-        }
-        return result;
-    }
-
-    private CellImage createCell(Cell cell, float x, float y) {
-        AssetManager assetManager = context.getAssetManager();
-
-        CellImage image = new CellImage(
-            cell,
-            new TextureRegion(assetManager.get(Res.CELL, Texture.class)),
-            new TextureRegion(assetManager.get(Res.SELECTED_CELL, Texture.class)),
-            new TextureRegion(assetManager.get(Res.FUTURE_CELL, Texture.class))
-        );
-        image.setPosition(x, y);
-
-        return image;
-    }
-
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0f, 0f, 0f, 1f);
@@ -289,6 +253,7 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
         if (width <= 0 || height <= 0) return;
 
         stage.getViewport().update(width, height, true);
+        gameFieldUi.updateGridPosition(stage);
     }
 
     @Override
