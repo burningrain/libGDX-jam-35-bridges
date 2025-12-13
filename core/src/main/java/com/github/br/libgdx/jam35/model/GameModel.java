@@ -136,7 +136,13 @@ public class GameModel {
             }
         }
         if (!isStepCalculated) {
-            int stepIndex = MathUtils.random.nextInt(variants.size - 1);
+            int pathIndex = variants.size - 1;
+            int stepIndex;
+            if (pathIndex == 0) {
+                stepIndex = 0;
+            } else {
+                stepIndex = MathUtils.random.nextInt(variants.size - 1);
+            }
             ComputerStepVariants computerStepVariant = variants.get(stepIndex);
 
             Array<Cell> possibleSteps = computerStepVariant.getPossibleSteps();
