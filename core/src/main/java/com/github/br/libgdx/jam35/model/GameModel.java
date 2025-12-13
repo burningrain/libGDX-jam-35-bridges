@@ -40,7 +40,7 @@ public class GameModel {
                 Cell cell = new Cell();
                 cell.setX(i);
                 cell.setY(j);
-                cell.setPlayer(Player.NO_PLAYER);
+                cell.setPlayer(Player.NULL_PLAYER);
                 cells[i][j] = cell;
             }
         }
@@ -84,10 +84,10 @@ public class GameModel {
         }
 
         currentSteps.add(new Step(currentPlayer, from.copy(), to.copy()));
-        from.setPlayer(Player.NO_PLAYER);
+        from.setPlayer(Player.NULL_PLAYER);
         to.setPlayer(currentPlayer);
         if (wasJump.wasJump) {
-            wasJump.midCell.setPlayer(Player.NO_PLAYER);
+            wasJump.midCell.setPlayer(Player.NULL_PLAYER);
         }
 
         notifyListeners();
@@ -176,7 +176,7 @@ public class GameModel {
         for (int x = 0; x < cells.length; x++) {
             for (int y = 0; y < cells[0].length; y++) {
                 Cell cell = cells[x][y];
-                if (cell.getPlayer() != me) {
+                if (!me.equals(cell.getPlayer())) {
                     continue;
                 }
                 WasJump wasJump = new WasJump();

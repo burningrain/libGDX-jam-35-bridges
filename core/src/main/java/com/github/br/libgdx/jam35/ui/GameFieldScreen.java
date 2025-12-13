@@ -44,7 +44,7 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
             int playersCount = gameModel.getPlayersCount();
             int playerId;
             Player player = cellModel.getPlayer();
-            if (player == Player.NO_PLAYER) {
+            if (player == Player.NULL_PLAYER) {
                 playerId = -1;
             } else {
                 playerId = player.getId();
@@ -56,7 +56,7 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
                 playerId++;
             }
 
-            cellModel.setPlayer((playerId == -1) ? Player.NO_PLAYER : gameModel.getPlayer(playerId));
+            cellModel.setPlayer((playerId == -1) ? Player.NULL_PLAYER : gameModel.getPlayer(playerId));
             currentCell.setPlayerColor(cellModel.getPlayer());
         }
     };

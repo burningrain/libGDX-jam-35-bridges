@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class Player {
 
-    public static final Player NO_PLAYER = null;
+    public static final Player NULL_PLAYER = null;
 
     private int id;
     private PlayerColorType playerColorType;
@@ -51,12 +51,12 @@ public class Player {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Player player = (Player) o;
-        return id == player.id && playerColorType == player.playerColorType && userType == player.userType;
+        return id == player.id;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, playerColorType, userType);
+        return Objects.hashCode(id);
     }
 
     @Override

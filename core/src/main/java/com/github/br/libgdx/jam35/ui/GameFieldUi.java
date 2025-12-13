@@ -30,8 +30,15 @@ public class GameFieldUi {
     }
 
     public boolean isOurCell(CellImage currentCell, Player playerWhoDoStep) {
+        if (currentCell == null) {
+            throw new IllegalArgumentException("currentCell is null");
+        }
+        if (playerWhoDoStep == null) {
+            throw new IllegalArgumentException("playerWhoDoStep is null");
+        }
+
         Cell currentModel = currentCell.getModel();
-        return playerWhoDoStep == currentModel.getPlayer();
+        return playerWhoDoStep.equals(currentModel.getPlayer());
     }
 
     public void selectFutureCells(GameContext context, CellImage currentCell, Array<CellImage> selectedFutureStepCells) {

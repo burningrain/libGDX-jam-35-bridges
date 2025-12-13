@@ -8,7 +8,7 @@ public class Validator {
         boolean isNeedTrowException = false;
         if (!isCellExist(grid, to.getX(), to.getY()) || !isAbleToStep(grid, from, to.getX(), to.getY())) {
             isNeedTrowException = true;
-        } else if (Player.NO_PLAYER == fromType || Player.NO_PLAYER != toType) {
+        } else if (Player.NULL_PLAYER == fromType || Player.NULL_PLAYER != toType) {
             isNeedTrowException = true;
         }
 
@@ -42,7 +42,7 @@ public class Validator {
     }
 
     public boolean isAbleToStep(Grid grid, Cell currentCell, int x, int y) {
-        if (Player.NO_PLAYER == currentCell.getPlayer()) {
+        if (Player.NULL_PLAYER == currentCell.getPlayer()) {
             return false;
         }
         if (!isCellExist(grid, x, y)) {
@@ -55,11 +55,11 @@ public class Validator {
         Player fromType = currentCell.getPlayer();
         Player toType = toCell.getPlayer();
 
-        return Player.NO_PLAYER != fromType && Player.NO_PLAYER == toType;
+        return Player.NULL_PLAYER != fromType && Player.NULL_PLAYER == toType;
     }
 
     public boolean isAbleToJump(Grid grid, Cell currentCell, int x, int y) {
-        if (Player.NO_PLAYER == currentCell.getPlayer()) {
+        if (Player.NULL_PLAYER == currentCell.getPlayer()) {
             return false;
         }
         if (!isCellExist(grid, x, y)) {
@@ -70,15 +70,15 @@ public class Validator {
         Cell toCell = cells[x][y];
 
         Cell midCell = getMidCell(currentCell, toCell, cells);
-        if (Player.NO_PLAYER != toCell.getPlayer()) {
+        if (Player.NULL_PLAYER != toCell.getPlayer()) {
             return false;
         }
 
-        if (Player.NO_PLAYER == midCell.getPlayer()) {
+        if (Player.NULL_PLAYER == midCell.getPlayer()) {
             return false;
         }
 
-        return currentCell.getPlayer() != midCell.getPlayer();
+        return !midCell.getPlayer().equals(currentCell.getPlayer());
     }
 
     private static Cell getMidCell(Cell currentCell, Cell toCell, Cell[][] cells) {
