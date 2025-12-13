@@ -22,35 +22,31 @@ public class GameModel {
 
     private final Array<Step> currentSteps = new Array<>();
 
-    public void init() {
+    public void initEmptyGrid() {
         this.setGrid(createEmptyGrid());
     }
 
     public void start() {
-        playerManager.setCurrentPlayer(0);
         playerManager.start();
+    }
+
+    public void reset() {
+        grid = Grid.NULL_OBJECT;
+        isNew = true;
+        currentSteps.clear();
+        playerManager.clear();
     }
 
     public boolean isGameEnd() {
         return playerManager.getWinner() != null;
     }
 
-
-    public Grid createEmptyGrid() {
-        Cell[][] cells = new Cell[8][8];
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                Cell cell = new Cell();
-                cell.setX(i);
-                cell.setY(j);
-                cell.setPlayer(Player.NULL_PLAYER);
-                cells[i][j] = cell;
-            }
-        }
-        return new Grid(cells);
+    public Array<Step> pollCurrentSteps() {
+        Array<Step> result = new Array<>(currentSteps);
+        currentSteps.clear();
+        return result;
     }
 
-    // "levels/level0.json"
     public void loadGrid(String pathToLevel) {
         FileHandle level = Gdx.files.local(pathToLevel);
         Grid newGrid = gridLoader.toGrid(new String(level.readBytes()));
@@ -240,6 +236,20 @@ public class GameModel {
         return playerManager.getWinner();
     }
 
+    private Grid createEmptyGrid() {
+        Cell[][] cells = new Cell[8][8];
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Cell cell = new Cell();
+                cell.setX(i);
+                cell.setY(j);
+                cell.setPlayer(Player.NULL_PLAYER);
+                cells[i][j] = cell;
+            }
+        }
+        return new Grid(cells);
+    }
+
     // observer
     public interface Listener {
         void update(GameModel model);
@@ -263,13 +273,6 @@ public class GameModel {
             listener.update(this);
         }
     }
-// observer
-
-
-    public Array<Step> pollCurrentSteps() {
-        Array<Step> result = new Array<>(currentSteps);
-        currentSteps.clear();
-        return result;
-    }
+    // observer
 
 }

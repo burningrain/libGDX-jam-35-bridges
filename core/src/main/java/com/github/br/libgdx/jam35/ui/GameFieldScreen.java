@@ -5,10 +5,16 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.github.br.libgdx.jam35.GameContext;
@@ -16,6 +22,9 @@ import com.github.br.libgdx.jam35.Res;
 import com.github.br.libgdx.jam35.model.*;
 
 public class GameFieldScreen implements Screen, GameModel.Listener {
+
+    private static final int PADDING_UP = -12;
+    public static final String LEVEL_TEXT = "LEVEL: ";
 
     private GameContext context;
 
@@ -26,6 +35,9 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
     private final UiFsm runtimeFsm;
 
     private GameType type;
+    private Label levelLabel;
+
+    private byte levelNumber = 0;
 
     private final ClickListener cellListener = new ClickListener() {
         @Override
@@ -65,7 +77,22 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
         this.context = context;
         this.gameFieldUi = new GameFieldUi();
         this.runtimeFsm = new UiFsm(gameFieldUi, context);
-        changeMode(type);
+        this.type = type;
+
+        runtimeFsm.reset();
+    }
+
+    @Override
+    public void show() {
+        stage = new Stage(context.getViewport());
+        skin = new Skin(Gdx.files.internal(Res.SKIN));
+
+        changeMode(this.type);
+        if (GameType.EDITOR == this.type) {
+            showEditor();
+        } else if (GameType.RUNTIME == this.type) {
+            showRuntime();
+        }
     }
 
     public void changeMode(GameType type) {
@@ -76,21 +103,16 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
         this.type = type;
     }
 
-    @Override
-    public void show() {
-        stage = new Stage(context.getViewport());
-        skin = new Skin(Gdx.files.internal(Res.SKIN));
-
+    private void showEditor() {
         GameModel gameModel = context.getGameModel();
-        update(gameModel);
-
-        gameModel.addListener(this);
-
-        // TODO убрать куда-нибудь
+        gameModel.reset();
+        gameModel.initEmptyGrid();
         gameModel.addPlayer(PlayerColorType.WHITE, UserType.HUMAN);
         gameModel.addPlayer(PlayerColorType.BLACK, UserType.COMPUTER);
         gameModel.setCurrentPlayer(0);
-        gameModel.start();
+
+        update(gameModel);
+        gameModel.addListener(this);
 
         //TODO убрать в отдельный скрин позже
         TextButton modeButton = createButton("RUNTIME", 950, 730);
@@ -109,7 +131,7 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
         saveButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                context.getGameModel().saveGrid("levels/level_1.json");
+                context.getGameModel().saveGrid("levels/level_2.json");
             }
         });
         stage.addActor(saveButton);
@@ -118,13 +140,47 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
         loadButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                context.getGameModel().loadGrid("levels/level_1.json");
+                context.getGameModel().loadGrid("levels/level_2.json");
             }
         });
         stage.addActor(loadButton);
-        //TODO убрать в отедльный скрин позже
 
         Gdx.input.setInputProcessor(stage);
+    }
+
+    private void showRuntime() {
+        levelLabel = createLevelLabel();
+        stage.addActor(levelLabel);
+
+        GameModel gameModel = context.getGameModel();
+        update(gameModel);
+        gameModel.addListener(this);
+
+        startLevel(levelNumber, gameModel);
+        Gdx.input.setInputProcessor(stage);
+    }
+
+    private void startLevel(byte levelNumber, GameModel gameModel) {
+        levelLabel.setText(LEVEL_TEXT + (levelNumber + 1));
+
+        gameModel.reset();
+        gameModel.loadGrid("levels/level_" + levelNumber + ".json");
+        gameModel.addPlayer(PlayerColorType.WHITE, UserType.HUMAN);
+        gameModel.addPlayer(PlayerColorType.BLACK, UserType.COMPUTER);
+        gameModel.setCurrentPlayer(0);
+        gameModel.start();
+    }
+
+    private Label createLevelLabel() {
+        int width = Gdx.graphics.getWidth();
+        int height = Gdx.graphics.getHeight();
+        float leftX = width / 2f - 22f;
+        float leftY = height + PADDING_UP * 3.2f;
+        Label levelLabel = new Label(LEVEL_TEXT, skin);
+        levelLabel.setX(leftX);
+        levelLabel.setY(leftY);
+
+        return levelLabel;
     }
 
     private TextButton createButton(String title, int x, int y) {
@@ -151,9 +207,32 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
 
         gameFieldUi.updateGrid();
         if (model.isGameEnd()) {
-            //TODO переход к следующему уровню по менюшке
+            // переход к следующему уровню по менюшке
             Player winner = model.getWinnerPlayer();
             System.out.println("game end. winner: " + winner);
+
+            levelNumber++;
+
+            Window window = new Window("YOU WIN!", skin, "border");
+            window.defaults().pad(4f);
+            //window.add("").row();
+            final TextButton button = new TextButton("Next", skin);
+            button.pad(8f);
+            button.addListener(new ChangeListener() {
+                @Override
+                public void changed(final ChangeEvent event, final Actor actor) {
+                    window.remove();
+                    startLevel(levelNumber, context.getGameModel());
+                }
+            });
+            window.add(button);
+            window.pack();
+            // We round the window position to avoid awkward half-pixel artifacts.
+            // Casting using (int) would also work.
+            window.setPosition(MathUtils.roundPositive(stage.getWidth() / 2f - window.getWidth() / 2f),
+                MathUtils.roundPositive(stage.getHeight() / 2f - window.getHeight() / 2f));
+            window.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(1f)));
+            stage.addActor(window);
         }
 
     }
@@ -161,13 +240,13 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
     private CellImage[][] createGrid(Grid modelGrid) {
         Cell[][] grid = modelGrid.getGrid();
 
-        int padding = 32;
+        int paddingRight = 20;
         int width = Gdx.graphics.getWidth();
         int height = Gdx.graphics.getHeight();
 
-        float cellSize = 64 + padding;
-        float leftX = (width - cellSize * grid.length + padding) / 2f;
-        float leftY = (height - cellSize * grid[0].length + padding) / 2f;
+        float cellSize = 64 + paddingRight;
+        float leftX = (width - cellSize * grid.length + paddingRight) / 2f;
+        float leftY = PADDING_UP + (height - cellSize * grid[0].length + paddingRight) / 2f;
 
         CellImage[][] result = new CellImage[grid.length][grid[0].length];
         for (int i = 0; i < grid.length; i++) {
@@ -205,7 +284,7 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
     public void resize(int width, int height) {
         if (width <= 0 || height <= 0) return;
 
-        stage.getViewport().update(width, height);
+        stage.getViewport().update(width, height, true);
     }
 
     @Override

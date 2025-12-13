@@ -22,9 +22,9 @@ public class Main extends Game {
         context = createGameContext(fitViewport);
         loadAssets(context.getAssetManager());
 
-        context.getGameModel().init();
+        context.getGameModel().initEmptyGrid();
 
-        gameFieldScreen = new GameFieldScreen(context, GameType.EDITOR);
+        gameFieldScreen = new GameFieldScreen(context, GameType.RUNTIME);
         setScreen(gameFieldScreen);
     }
 
