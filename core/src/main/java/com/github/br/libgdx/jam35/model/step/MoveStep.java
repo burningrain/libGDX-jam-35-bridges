@@ -1,12 +1,15 @@
-package com.github.br.libgdx.jam35.model;
+package com.github.br.libgdx.jam35.model.step;
 
-public class Step {
+import com.github.br.libgdx.jam35.model.Cell;
+import com.github.br.libgdx.jam35.model.Player;
+
+public class MoveStep implements Step {
 
     private final Player currentPlayer;
     private final Cell from;
     private final Cell to;
 
-    public Step(Player currentPlayer, Cell from, Cell to) {
+    public MoveStep(Player currentPlayer, Cell from, Cell to) {
         this.currentPlayer = currentPlayer;
         this.from = from;
         this.to = to;
@@ -22,6 +25,11 @@ public class Step {
 
     public Cell getTo() {
         return to;
+    }
+
+    @Override
+    public void visit(StepVisitor stepVisitor) {
+        stepVisitor.visit(this);
     }
 
 }

@@ -27,21 +27,25 @@ public class StepResolver {
         if (isJumpLeft) {
             wasJump.wasJump = true;
             wasJump.midCell = cells[currentX - 1][currentY];
+            wasJump.currentCell = currentCell;
             return result;
         }
         if (isJumpRight) {
             wasJump.wasJump = true;
             wasJump.midCell = cells[currentX + 1][currentY];
+            wasJump.currentCell = currentCell;
             return result;
         }
         if (isJumpUp) {
             wasJump.wasJump = true;
             wasJump.midCell = cells[currentX][currentY + 1];
+            wasJump.currentCell = currentCell;
             return result;
         }
         if (isJumpDown) {
             wasJump.wasJump = true;
             wasJump.midCell = cells[currentX][currentY - 1];
+            wasJump.currentCell = currentCell;
             return result;
         }
 

@@ -5,6 +5,9 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
+import com.github.br.libgdx.jam35.model.step.ClearCellStep;
+import com.github.br.libgdx.jam35.model.step.MoveStep;
+import com.github.br.libgdx.jam35.model.step.Step;
 
 public class GameModel {
 
@@ -83,15 +86,16 @@ public class GameModel {
             throw new IllegalArgumentException("need to jump");
         }
 
-        currentSteps.add(new Step(currentPlayer, from.copy(), to.copy()));
+        currentSteps.add(new MoveStep(currentPlayer, from.copy(), to.copy()));
         from.setPlayer(Player.NULL_PLAYER);
         to.setPlayer(currentPlayer);
         if (wasJump.wasJump) {
             wasJump.midCell.setPlayer(Player.NULL_PLAYER);
+            currentSteps.add(new ClearCellStep(wasJump.midCell.copy()));
         }
-
         notifyListeners();
 
+        // проверяем условия окончания игры
         ObjectSet<Player> activePlayers = getActivePlayersInTheGame(grid);
         if (activePlayers.size == 1) {
             playerManager.setWinner(activePlayers.iterator().next());
@@ -100,13 +104,17 @@ public class GameModel {
         }
 
         // если был прыжок, то смотрим следующий ход - прыжок или нет
-        // если прыжок, мы в середине удара находимся
-        if (wasJump.wasJump) {
+        // если прыжок ТОЙ ЖЕ ШАШКОЙ!!!, мы в середине удара находимся
+        if (wasJump.wasJump && wasJump.currentCell == from) {
             isNeedJump = isNeedToJump(grid, currentPlayer);
             if (isNeedJump) {
-                // если идет удар, то ход не переходит к следующему игроку
+                // если идет удар той же шашкой(!), то ход не переходит к следующему игроку
                 // а текущий продолжает свой удар
-                return;
+                WasJump willNextStepJump = new WasJump();
+                getPossibleStepsForCell(to, willNextStepJump);
+                if (willNextStepJump.currentCell == to) {
+                    return;
+                }
             }
         }
 
@@ -162,7 +170,7 @@ public class GameModel {
             ComputerStepVariants computerStepVariant = variants.get(variantIndex);
 
             Array<Cell> possibleSteps = computerStepVariant.getPossibleSteps();
-            int toIndex = (possibleSteps.size - 1 == 0)? 0 : MathUtils.random.nextInt(possibleSteps.size - 1);
+            int toIndex = (possibleSteps.size - 1 == 0) ? 0 : MathUtils.random.nextInt(possibleSteps.size - 1);
             from = computerStepVariant.getCell();
             to = possibleSteps.get(toIndex);
         }
