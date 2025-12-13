@@ -136,17 +136,11 @@ public class GameModel {
             }
         }
         if (!isStepCalculated) {
-            int pathIndex = variants.size - 1;
-            int stepIndex;
-            if (pathIndex == 0) {
-                stepIndex = 0;
-            } else {
-                stepIndex = MathUtils.random.nextInt(variants.size - 1);
-            }
-            ComputerStepVariants computerStepVariant = variants.get(stepIndex);
+            int variantIndex = (variants.size - 1 == 0) ? 0 : MathUtils.random.nextInt(variants.size - 1);
+            ComputerStepVariants computerStepVariant = variants.get(variantIndex);
 
             Array<Cell> possibleSteps = computerStepVariant.getPossibleSteps();
-            int toIndex = MathUtils.random.nextInt(possibleSteps.size - 1);
+            int toIndex = (possibleSteps.size - 1 == 0)? 0 : MathUtils.random.nextInt(possibleSteps.size - 1);
             from = computerStepVariant.getCell();
             to = possibleSteps.get(toIndex);
         }
