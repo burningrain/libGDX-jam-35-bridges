@@ -141,12 +141,19 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
             return;
         }
 
+        // инициализация нового уровня / новой игры
         if (model.isNew()) {
             model.setNew(false);
             gameFieldUi.initGrid(createGrid(modelGrid));
             changeMode(type);
-        } else {
-            gameFieldUi.updateGrid();
+            return;
+        }
+
+        gameFieldUi.updateGrid();
+        if (model.isGameEnd()) {
+            //TODO переход к следующему уровню по менюшке
+            Player winner = model.getWinnerPlayer();
+            System.out.println("game end. winner: " + winner);
         }
 
     }

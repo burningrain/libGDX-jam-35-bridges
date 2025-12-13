@@ -11,7 +11,7 @@ public class PlayerManager {
 
     private Player winner;
 
-    public void goToNextPlayer() {
+    public Player goToNextPlayer() {
         int nextPlayer = currentPlayerNumber + 1;
         if (nextPlayer == players.size) {
             currentPlayerNumber = 0;
@@ -19,6 +19,7 @@ public class PlayerManager {
             currentPlayerNumber++;
         }
         setCurrentPlayer(currentPlayerNumber);
+        return getCurrentPlayer();
     }
 
     public void addPlayer(PlayerColorType playerColorType, UserType userType) {

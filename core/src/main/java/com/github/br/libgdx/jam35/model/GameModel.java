@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectSet;
 
 public class GameModel {
 
@@ -27,7 +28,7 @@ public class GameModel {
         playerManager.start();
     }
 
-    public boolean isEnd() {
+    public boolean isGameEnd() {
         return playerManager.getWinner() != null;
     }
 
@@ -88,7 +89,15 @@ public class GameModel {
         if (wasJump.wasJump) {
             wasJump.midCell.setPlayer(Player.NO_PLAYER);
         }
+
         notifyListeners();
+
+        ObjectSet<Player> activePlayers = getActivePlayersInTheGame(grid);
+        if (activePlayers.size == 1) {
+            playerManager.setWinner(activePlayers.iterator().next());
+            notifyListeners();
+            return;
+        }
 
         // если был прыжок, то смотрим следующий ход - прыжок или нет
         // если прыжок, мы в середине удара находимся
@@ -101,14 +110,27 @@ public class GameModel {
             }
         }
 
-
         // иначе переходим к следующему игроку
-        playerManager.goToNextPlayer();
-        Player nextPlayer = playerManager.getCurrentPlayer();
-        while (UserType.COMPUTER == nextPlayer.getUserType()) {
+        Player nextPlayer = playerManager.goToNextPlayer();
+        while (!isGameEnd() && UserType.COMPUTER == nextPlayer.getUserType()) {
             calculateComputerStep(nextPlayer);
             nextPlayer = playerManager.getCurrentPlayer();
         }
+    }
+
+    private ObjectSet<Player> getActivePlayersInTheGame(Grid grid) {
+        ObjectSet<Player> result = new ObjectSet<>();
+        Cell[][] cells = grid.getGrid();
+        for (Cell[] rows : cells) {
+            for (Cell row : rows) {
+                Player player = row.getPlayer();
+                if (player != null) {
+                    result.add(player);
+                }
+            }
+        }
+
+        return result;
     }
 
     private boolean isNeedToJump(Grid grid, Player currentPlayer) {
@@ -126,16 +148,16 @@ public class GameModel {
 
         Cell from = null;
         Cell to = null;
-        boolean isStepCalculated = false;
+        boolean isNeedJump = false;
         for (ComputerStepVariants variant : variants) {
             if (variant.getWasJump().wasJump) {
                 from = variant.getCell();
                 to = variant.getPossibleSteps().get(0);
-                isStepCalculated = true;
+                isNeedJump = true;
                 break;
             }
         }
-        if (!isStepCalculated) {
+        if (!isNeedJump) {
             int variantIndex = (variants.size - 1 == 0) ? 0 : MathUtils.random.nextInt(variants.size - 1);
             ComputerStepVariants computerStepVariant = variants.get(variantIndex);
 
@@ -204,6 +226,10 @@ public class GameModel {
 
     public Player getPlayer(int playerId) {
         return playerManager.getPlayer(playerId);
+    }
+
+    public Player getWinnerPlayer() {
+        return playerManager.getWinner();
     }
 
     // observer
