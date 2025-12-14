@@ -9,6 +9,7 @@ import com.github.br.libgdx.jam35.GameContext;
 import com.github.br.libgdx.jam35.model.Cell;
 import com.github.br.libgdx.jam35.model.GameModel;
 import com.github.br.libgdx.jam35.model.Player;
+import com.github.br.libgdx.jam35.model.UserType;
 
 public class UiFsm {
 
@@ -76,7 +77,13 @@ public class UiFsm {
 
         currentFsmState = UiFsmStateType.STEP;
         try {
-            gameModel.step(modelFrom, modelTo);
+            gameModel.doStep(modelFrom, modelTo);
+
+            Player nextPlayer = gameModel.getCurrentPlayer();
+            while (!gameModel.isGameEnd() && UserType.COMPUTER == nextPlayer.getUserType()) {
+                gameModel.doComputerStep(nextPlayer);
+                nextPlayer = gameModel.getCurrentPlayer();
+            }
         } catch (IllegalArgumentException e) {
             UiUtils.createWindow(stage, skin, "You need to jump!", "OK", new ChangeListener() {
                 @Override

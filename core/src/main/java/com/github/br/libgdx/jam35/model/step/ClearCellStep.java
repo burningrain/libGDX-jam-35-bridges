@@ -15,8 +15,8 @@ public class ClearCellStep implements Step {
     }
 
     @Override
-    public void visit(StepVisitor stepVisitor) {
-        stepVisitor.visit(this);
+    public void visit(UiStepVisitor uiStepVisitor) {
+        uiStepVisitor.visit(this);
     }
 
 }

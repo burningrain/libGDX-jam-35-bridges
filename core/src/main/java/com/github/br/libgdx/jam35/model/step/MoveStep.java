@@ -8,11 +8,13 @@ public class MoveStep implements Step {
     private final Player currentPlayer;
     private final Cell from;
     private final Cell to;
+    private final boolean isJump;
 
-    public MoveStep(Player currentPlayer, Cell from, Cell to) {
+    public MoveStep(Player currentPlayer, Cell from, Cell to, boolean isJump) {
         this.currentPlayer = currentPlayer;
         this.from = from;
         this.to = to;
+        this.isJump = isJump;
     }
 
     public Player getCurrentPlayer() {
@@ -27,9 +29,13 @@ public class MoveStep implements Step {
         return to;
     }
 
+    public boolean isJump() {
+        return isJump;
+    }
+
     @Override
-    public void visit(StepVisitor stepVisitor) {
-        stepVisitor.visit(this);
+    public void visit(UiStepVisitor uiStepVisitor) {
+        uiStepVisitor.visit(this);
     }
 
 }

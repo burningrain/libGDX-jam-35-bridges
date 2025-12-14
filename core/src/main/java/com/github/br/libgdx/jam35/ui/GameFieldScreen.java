@@ -2,21 +2,21 @@ package com.github.br.libgdx.jam35.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.github.br.libgdx.jam35.GameContext;
 import com.github.br.libgdx.jam35.Res;
 import com.github.br.libgdx.jam35.model.*;
+import com.github.br.libgdx.jam35.model.step.Step;
+import com.github.br.libgdx.jam35.model.step.UiStepVisitor;
 
 public class GameFieldScreen implements Screen, GameModel.Listener {
 
@@ -30,6 +30,7 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
 
     private final GameFieldUi gameFieldUi;
     private final UiFsm runtimeFsm;
+    private UiStepVisitor uiStepVisitor;
 
     private GameType type;
     private Label levelLabel;
@@ -73,6 +74,7 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
     public GameFieldScreen(GameContext context, GameType type) {
         this.context = context;
         this.gameFieldUi = new GameFieldUi(context);
+        uiStepVisitor = new UiStepVisitor(gameFieldUi);
         this.runtimeFsm = new UiFsm(gameFieldUi, context);
         this.type = type;
 
@@ -165,27 +167,38 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
             return;
         }
 
-        gameFieldUi.updateGridByModel(modelGrid);
-        if (model.isGameEnd()) {
-            // переход к следующему уровню по менюшке
-            Player winner = model.getWinnerPlayer();
-            System.out.println("game end. winner: " + winner);
 
-            levelNumber++;
-
-            UiUtils.createWindow(stage, skin, "YOU WIN!", "Next", new ChangeListener() {
-                @Override
-                public void changed(final ChangeEvent event, final Actor actor) {
-                    startLevel(levelNumber, context.getGameModel());
-                }
-            });
+        Array<Step> steps = model.pollCurrentSteps();
+        for (Step step : steps) {
+            step.visit(uiStepVisitor);
         }
+
+        uiStepVisitor.executeWhenStepQueueIsEnd(new Runnable() {
+            @Override
+            public void run() {
+                gameFieldUi.updateGridByModel(modelGrid);
+                if (model.isGameEnd()) {
+                    // переход к следующему уровню по менюшке
+                    Player winner = model.getWinnerPlayer();
+
+                    levelNumber++;
+
+                    UiUtils.createWindow(stage, skin, "YOU WIN!", "Next", new ChangeListener() {
+                        @Override
+                        public void changed(final ChangeEvent event, final Actor actor) {
+                            startLevel(levelNumber, context.getGameModel());
+                        }
+                    });
+                }
+            }
+        });
 
     }
 
     @Override
     public void render(float delta) {
         ScreenUtils.clear(51f / 255f, 204f / 255f, 255f / 255f, 1f);
+        uiStepVisitor.act(delta);
         stage.act(delta);
         stage.draw();
     }

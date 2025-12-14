@@ -60,7 +60,7 @@ public class GameModel {
         level.writeString(grid, false);
     }
 
-    public void step(Cell from, Cell to) {
+    public void doStep(Cell from, Cell to) {
         validator.validationStep(grid, from, to);
 
         WasJump wasJump = new WasJump();
@@ -77,7 +77,7 @@ public class GameModel {
             throw new IllegalArgumentException("need to jump");
         }
 
-        currentSteps.add(new MoveStep(currentPlayer, from.copy(), to.copy()));
+        currentSteps.add(new MoveStep(currentPlayer, from.copy(), to.copy(), wasJump.wasJump));
         from.setPlayer(Player.NULL_PLAYER);
         to.setPlayer(currentPlayer);
         if (wasJump.wasJump) {
@@ -110,11 +110,7 @@ public class GameModel {
         }
 
         // иначе переходим к следующему игроку
-        Player nextPlayer = playerManager.goToNextPlayer();
-        while (!isGameEnd() && UserType.COMPUTER == nextPlayer.getUserType()) {
-            calculateComputerStep(nextPlayer);
-            nextPlayer = playerManager.getCurrentPlayer();
-        }
+        playerManager.goToNextPlayer();
     }
 
     private ObjectSet<Player> getActivePlayersInTheGame(Grid grid) {
@@ -142,7 +138,7 @@ public class GameModel {
         return false;
     }
 
-    public void calculateComputerStep(Player player) {
+    public void doComputerStep(Player player) {
         Array<ComputerStepVariants> variants = getVariants(grid, player);
 
         Cell from = null;
@@ -166,7 +162,7 @@ public class GameModel {
             to = possibleSteps.get(toIndex);
         }
 
-        step(from, to);
+        doStep(from, to);
     }
 
     private Array<ComputerStepVariants> getVariants(Grid grid, Player me) {
