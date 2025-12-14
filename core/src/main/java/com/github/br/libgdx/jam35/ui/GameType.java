@@ -3,6 +3,9 @@ package com.github.br.libgdx.jam35.ui;
 public enum GameType {
 
     QUIZ,
-    EDITOR
+    EDITOR,
+
+    TWO_PLAYERS,
+    FOUR_PLAYERS
 
 }

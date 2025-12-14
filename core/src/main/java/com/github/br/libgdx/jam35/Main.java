@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.br.libgdx.jam35.model.GameModel;
 import com.github.br.libgdx.jam35.ui.EditorScreen;
 import com.github.br.libgdx.jam35.ui.GameFieldScreen;
+import com.github.br.libgdx.jam35.ui.GameFieldScreen2Players;
 import com.github.br.libgdx.jam35.ui.GameType;
 import com.github.br.libgdx.jam35.ui.MainMenuScreen;
 import com.ray3k.stripe.FreeTypeSkinLoader;
@@ -25,6 +26,8 @@ public class Main extends Game implements ScreenLoader {
     private MainMenuScreen mainMenuScreen;
     private GameFieldScreen quizScreen;
     private EditorScreen editorScreen;
+    private GameFieldScreen2Players gameFieldScreen2Players;
+    private GameFieldScreen2Players gameFieldScreen4Players;
 
     @Override
     public void create() {
@@ -37,6 +40,8 @@ public class Main extends Game implements ScreenLoader {
         mainMenuScreen = new MainMenuScreen(context, this);
         quizScreen = new GameFieldScreen(context, GameType.QUIZ, this);
         editorScreen = new EditorScreen(context, this);
+        gameFieldScreen2Players = new GameFieldScreen2Players(context, GameType.QUIZ, this, false);
+        gameFieldScreen4Players = new GameFieldScreen2Players(context, GameType.QUIZ, this, true);
 
         loadMainMenu();
     }
@@ -85,11 +90,11 @@ public class Main extends Game implements ScreenLoader {
 
     @Override
     public void load2Players() {
-
+        setScreen(gameFieldScreen2Players);
     }
 
     @Override
     public void load4Players() {
-
+        setScreen(gameFieldScreen4Players);
     }
 }

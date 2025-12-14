@@ -53,7 +53,7 @@ public class CellImage extends Image {
         if (player == null) {
             region = emptyCloud;
         } else {
-            switch (player.getPlayerType()) {
+            switch (player.getPlayerColorType()) {
                 case YELLOW:
                     region = yellowCloud;
                     break;

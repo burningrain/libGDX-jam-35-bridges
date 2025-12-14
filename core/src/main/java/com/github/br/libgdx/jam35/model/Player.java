@@ -21,10 +21,6 @@ public class Player implements Json.Serializable {
         this.userType = userType;
     }
 
-    public PlayerColorType getPlayerType() {
-        return playerColorType;
-    }
-
     public UserType getUserType() {
         return userType;
     }

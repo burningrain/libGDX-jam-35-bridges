@@ -62,7 +62,9 @@ public class Cell implements Json.Serializable {
     public void write(Json json) {
         json.writeValue("x", x);
         json.writeValue("y", y);
-        json.writeValue("player", player, Player.class);
+        if (player != null) {
+            json.writeValue("player", player, Player.class);
+        }
     }
 
     @Override

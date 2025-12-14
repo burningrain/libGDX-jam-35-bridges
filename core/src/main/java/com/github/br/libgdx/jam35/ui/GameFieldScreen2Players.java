@@ -2,36 +2,39 @@ package com.github.br.libgdx.jam35.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.github.br.libgdx.jam35.GameContext;
 import com.github.br.libgdx.jam35.Res;
 import com.github.br.libgdx.jam35.ScreenLoader;
 import com.github.br.libgdx.jam35.model.*;
+import com.github.br.libgdx.jam35.model.step.Step;
+import com.github.br.libgdx.jam35.model.step.UiStepVisitor;
 
-public class EditorScreen implements Screen, GameModel.Listener {
+public class GameFieldScreen2Players implements Screen, GameModel.Listener {
 
-    private static final int PADDING_UP = -10;
+    private static final int PADDING_UP = -30;
+    public static final String LEVEL_TEXT = "LEVEL: ";
 
     private final GameContext context;
+    private final ScreenLoader screenLoader;
 
     private Stage stage;
     private Skin skin;
 
     private final GameFieldUi gameFieldUi;
     private final UiFsm runtimeFsm;
+    private UiStepVisitor uiStepVisitor;
 
     private GameType type;
-    private final ScreenLoader screenLoader;
 
     private final ClickListener cellListener = new ClickListener() {
         @Override
@@ -67,12 +70,16 @@ public class EditorScreen implements Screen, GameModel.Listener {
         }
     };
 
-    public EditorScreen(GameContext context, ScreenLoader screenLoader) {
+    private boolean isFourPlayers;
+
+    public GameFieldScreen2Players(GameContext context, GameType type, ScreenLoader screenLoader, boolean isFourPlayers) {
         this.context = context;
-        this.screenLoader = screenLoader;
         this.gameFieldUi = new GameFieldUi(context);
+        uiStepVisitor = new UiStepVisitor(gameFieldUi);
         this.runtimeFsm = new UiFsm(gameFieldUi, context);
-        this.type = GameType.EDITOR;
+        this.type = type;
+        this.screenLoader = screenLoader;
+        this.isFourPlayers = isFourPlayers;
 
         runtimeFsm.reset();
     }
@@ -85,7 +92,7 @@ public class EditorScreen implements Screen, GameModel.Listener {
         runtimeFsm.setSkin(skin);
 
         changeMode(this.type);
-        showEditor();
+        showRuntime();
 
         int currentWidth = Gdx.graphics.getWidth();
         int currentHeight = Gdx.graphics.getHeight();
@@ -100,62 +107,71 @@ public class EditorScreen implements Screen, GameModel.Listener {
         this.type = type;
     }
 
-    private void showEditor() {
+    private void showRuntime() {
+
         GameModel gameModel = context.getGameModel();
-        resetGameModel(gameModel);
+        startLevel(gameModel);
 
         update(gameModel);
         gameModel.addListener(this);
 
-        TextButton modeButton = createButton("RUNTIME", 750, 570);
-        modeButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                type = (GameType.EDITOR == type) ? GameType.QUIZ : GameType.EDITOR;
-                String buttonText = (GameType.EDITOR == type) ? "RUNTIME" : "EDITOR";
-                modeButton.setText(buttonText);
-                changeMode(type);
-            }
-        });
-        stage.addActor(modeButton);
-
-        TextButton saveButton = createButton("SAVE", 750, 420);
-        saveButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                context.getGameModel().saveGrid("levels/level_2.json");
-            }
-        });
-        stage.addActor(saveButton);
-
-        TextButton loadButton = createButton("LOAD", 750, 270);
-        loadButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                context.getGameModel().loadGrid("levels/level_2.json");
-            }
-        });
-        stage.addActor(loadButton);
-
-        TextButton backToMenuButton = createButton("BACK", 750, 70);
-        backToMenuButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                screenLoader.loadMainMenu();
-            }
-        });
-        stage.addActor(backToMenuButton);
-
         Gdx.input.setInputProcessor(stage);
     }
 
-    private static void resetGameModel(GameModel gameModel) {
+    private void resetGameModel(GameModel gameModel) {
         gameModel.reset();
         gameModel.initEmptyGrid();
-        gameModel.addPlayer(PlayerColorType.YELLOW, UserType.HUMAN);
-        gameModel.addPlayer(PlayerColorType.VIOLET, UserType.COMPUTER);
+        gameModel.addPlayer(PlayerColorType.BLUE, UserType.HUMAN);
+        gameModel.addPlayer(PlayerColorType.BROWN, UserType.HUMAN);
+        if (this.isFourPlayers) {
+            gameModel.addPlayer(PlayerColorType.YELLOW, UserType.HUMAN);
+            gameModel.addPlayer(PlayerColorType.VIOLET, UserType.HUMAN);
+        }
+
         gameModel.setCurrentPlayer(0);
         gameModel.setNew(true);
+    }
+
+    private static PlayerColorType getComputerPlayerByLevel(int levelNumber) {
+        switch (levelNumber) {
+            case 0:
+            case 1:
+            case 2:
+                return PlayerColorType.VIOLET;
+            case 3:
+            case 4:
+            case 5:
+                return PlayerColorType.BROWN;
+            case 6:
+            case 7:
+            case 8:
+                return PlayerColorType.BLUE;
+            default:
+                throw new IllegalArgumentException("levelNumber is not supported: " + levelNumber);
+        }
+    }
+
+    private void startLevel(GameModel gameModel) {
+        resetGameModel(gameModel);
+        if (isFourPlayers) {
+            gameModel.loadGrid("levels/level_4_players.json");
+        } else {
+            gameModel.loadGrid("levels/level_2_players.json");
+        }
+
+        gameModel.start();
+    }
+
+    private Label createLevelLabel() {
+        float width = stage.getViewport().getWorldWidth();
+        float height = stage.getViewport().getWorldHeight();
+        float leftX = width / 2f - 120f;
+        float leftY = height + PADDING_UP * 3.2f;
+        Label levelLabel = new Label(LEVEL_TEXT, skin);
+        levelLabel.setX(leftX);
+        levelLabel.setY(leftY);
+
+        return levelLabel;
     }
 
     private TextButton createButton(String title, int x, int y) {
@@ -180,39 +196,40 @@ public class EditorScreen implements Screen, GameModel.Listener {
             return;
         }
 
-        gameFieldUi.updateGridByModel(modelGrid);
-        if (model.isGameEnd()) {
-            // переход к следующему уровню по менюшке
-            Player winner = model.getWinnerPlayer();
-            System.out.println("game end. winner: " + winner);
 
-            Window window = new Window("Player" + winner.getPlayerColorType().name() + "WIN!", skin);
-            window.defaults().pad(4f);
-            //window.add("").row();
-            final TextButton button = new TextButton("OK", skin);
-            button.pad(8f);
-            button.addListener(new ChangeListener() {
-                @Override
-                public void changed(final ChangeEvent event, final Actor actor) {
-                    resetGameModel(context.getGameModel());
-                    window.remove();
-                }
-            });
-            window.add(button);
-            window.pack();
-            // We round the window position to avoid awkward half-pixel artifacts.
-            // Casting using (int) would also work.
-            window.setPosition(MathUtils.roundPositive(stage.getWidth() / 2f - window.getWidth() / 2f),
-                MathUtils.roundPositive(stage.getHeight() / 2f - window.getHeight() / 2f));
-            window.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(1f)));
-            stage.addActor(window);
+        Array<Step> steps = model.pollCurrentSteps();
+        for (Step step : steps) {
+            step.visit(uiStepVisitor);
         }
+
+        uiStepVisitor.executeWhenStepQueueIsEnd(new Runnable() {
+            @Override
+            public void run() {
+                gameFieldUi.updateGridByModel(modelGrid);
+                if (model.isGameEnd()) {
+                    // переход к следующему уровню по менюшке
+                    Player winner = model.getWinnerPlayer();
+
+                    if (winner != null) {
+                        UiUtils.createWindow(stage, skin,
+                            "Player '" + winner.getPlayerColorType() + "' WIN!", "Menu",
+                            new ChangeListener() {
+                                @Override
+                                public void changed(final ChangeEvent event, final Actor actor) {
+                                    screenLoader.loadMainMenu();
+                                }
+                            });
+                    }
+                }
+            }
+        });
 
     }
 
     @Override
     public void render(float delta) {
         ScreenUtils.clear(51f / 255f, 204f / 255f, 255f / 255f, 1f);
+        uiStepVisitor.act(delta);
         stage.act(delta);
         stage.draw();
     }
@@ -222,7 +239,7 @@ public class EditorScreen implements Screen, GameModel.Listener {
         if (width <= 0 || height <= 0) return;
 
         stage.getViewport().update(width, height, true);
-        gameFieldUi.updateGridPosition(-140, stage);
+        gameFieldUi.updateGridPosition(0, stage);
     }
 
     @Override
