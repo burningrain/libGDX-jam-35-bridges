@@ -3,6 +3,7 @@ package com.github.br.libgdx.jam35.ui;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
@@ -178,14 +179,49 @@ public class GameFieldUi {
         animation.setPlayMode(Animation.PlayMode.NORMAL);
 
         Bridge bridge = new Bridge(animation);
-        bridge.setX(getBridgeX(from, to));
-        bridge.setY(getBridgeY(from, to));
+        // *** 1. Вычисляем центры ячеек в пикселях ***
+        // getCellCenterX/Y - это вспомогательные методы, которые мы определим ниже
+        float fromCenterX = getCellCenterX(from);
+        float fromCenterY = getCellCenterY(from);
+        float toCenterX = getCellCenterX(to);
+        float toCenterY = getCellCenterY(to);
 
-        bridge.setRotation(getRotation(from.getModel(), to.getModel()));
+        // *** 2. Вычисляем расстояние и угол в пикселях ***
+        float deltaX = toCenterX - fromCenterX;
+        float deltaY = toCenterY - fromCenterY;
 
-        bridge.setScaleX(Math.max(1, Math.abs(to.getModel().getX() - from.getModel().getX())));
-        bridge.setScaleY(Math.max(1, Math.abs(to.getModel().getY() - from.getModel().getY())));
+        // Используем теорему Пифагора для получения фактической длины в пикселях
+        float distance = (float) Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
+        // Вычисляем угол в радианах, затем переводим в градусы (libGDX Rotation в градусах)
+        // atan2 возвращает угол между осью X и точкой (deltaX, deltaY)
+        float angleRad = MathUtils.atan2(deltaY, deltaX);
+        float angleDeg = angleRad * MathUtils.radiansToDegrees;
+
+        // Ваша картинка моста направлена вверх (вдоль оси Y),
+        // atan2 считает угол от оси X (вправо).
+        // Нужно скорректировать угол на 90 градусов:
+        float rotationAngle = angleDeg - 90;
+
+        // *** 3. Размещаем мост ***
+        // Устанавливаем положение X/Y так, чтобы ЦЕНТР моста оказался ровно посередине между ячейками
+        bridge.setPosition(
+            ((fromCenterX + toCenterX) / 2f) - bridge.getWidth()/2f,
+            ((fromCenterY + toCenterY) / 2f) - bridge.getHeight()/2f
+        );
+
+        // *** 4. Применяем поворот ***
+        bridge.setRotation(rotationAngle);
+
+        // *** 5. Применяем масштабирование (только по длине/Y оси вашего спрайта) ***
+        // Ширина спрайта по умолчанию
+        float defaultSpriteHeight = bridge.getHeight();
+
+        // Масштабируем высоту спрайта так, чтобы она покрыла расстояние distance
+        bridge.setScaleY(distance / defaultSpriteHeight);
+
+        // Масштаб по X (ширина самого моста) оставляем стандартным (1)
+        bridge.setScaleX(1.0f);
 
         return bridge;
     }
