@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.github.br.libgdx.jam35.GameContext;
 import com.github.br.libgdx.jam35.Res;
+import com.github.br.libgdx.jam35.ScreenLoader;
 import com.github.br.libgdx.jam35.model.*;
 import com.github.br.libgdx.jam35.model.step.Step;
 import com.github.br.libgdx.jam35.model.step.UiStepVisitor;
@@ -24,6 +25,7 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
     public static final String LEVEL_TEXT = "LEVEL: ";
 
     private final GameContext context;
+    private final ScreenLoader screenLoader;
 
     private Stage stage;
     private Skin skin;
@@ -71,12 +73,13 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
         }
     };
 
-    public GameFieldScreen(GameContext context, GameType type) {
+    public GameFieldScreen(GameContext context, GameType type, ScreenLoader screenLoader) {
         this.context = context;
         this.gameFieldUi = new GameFieldUi(context);
         uiStepVisitor = new UiStepVisitor(gameFieldUi);
         this.runtimeFsm = new UiFsm(gameFieldUi, context);
         this.type = type;
+        this.screenLoader = screenLoader;
 
         runtimeFsm.reset();
     }
@@ -117,18 +120,36 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
         Gdx.input.setInputProcessor(stage);
     }
 
-    private static void resetGameModel(GameModel gameModel) {
+    private static void resetGameModel(GameModel gameModel, int levelNumber) {
         gameModel.reset();
         gameModel.initEmptyGrid();
         gameModel.addPlayer(PlayerColorType.YELLOW, UserType.HUMAN);
-        gameModel.addPlayer(PlayerColorType.VIOLET, UserType.COMPUTER);
+        gameModel.addPlayer(getComputerPlayerByLevel(levelNumber), UserType.COMPUTER);
         gameModel.setCurrentPlayer(0);
         gameModel.setNew(true);
     }
 
+    private static PlayerColorType getComputerPlayerByLevel(int levelNumber) {
+        switch (levelNumber) {
+            case 0:
+            case 1:
+            case 2:
+                return PlayerColorType.VIOLET;
+            case 3:
+            case 4:
+            case 5:
+                return PlayerColorType.BROWN;
+            case 6:
+            case 7:
+            case 8:
+                return PlayerColorType.BLUE;
+            default: throw new IllegalArgumentException("levelNumber is not supported: " + levelNumber);
+        }
+    }
+
     private void startLevel(byte levelNumber, GameModel gameModel) {
         levelLabel.setText(LEVEL_TEXT + (levelNumber + 1));
-        resetGameModel(gameModel);
+        resetGameModel(gameModel, levelNumber);
         gameModel.loadGrid("levels/level_" + levelNumber + ".json");
         gameModel.start();
     }
@@ -183,12 +204,21 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
 
                     levelNumber++;
 
-                    UiUtils.createWindow(stage, skin, "YOU WIN!", "Next", new ChangeListener() {
-                        @Override
-                        public void changed(final ChangeEvent event, final Actor actor) {
-                            startLevel(levelNumber, context.getGameModel());
-                        }
-                    });
+                    if (levelNumber == 8) {
+                        UiUtils.createWindow(stage, skin, "THANK YOU FOR PLAYING!", "Menu", new ChangeListener() {
+                            @Override
+                            public void changed(final ChangeEvent event, final Actor actor) {
+                                screenLoader.loadMainMenu();
+                            }
+                        });
+                    } else {
+                        UiUtils.createWindow(stage, skin, "YOU WIN!", "Next", new ChangeListener() {
+                            @Override
+                            public void changed(final ChangeEvent event, final Actor actor) {
+                                startLevel(levelNumber, context.getGameModel());
+                            }
+                        });
+                    }
                 }
             }
         });

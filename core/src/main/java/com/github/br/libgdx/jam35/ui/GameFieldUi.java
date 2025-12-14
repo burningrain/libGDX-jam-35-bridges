@@ -175,7 +175,7 @@ public class GameFieldUi {
         AssetManager assetManager = context.getAssetManager();
         TextureAtlas atlas = assetManager.get(Res.CLOUDS_AND_BRIDGES);
         Array<TextureAtlas.AtlasRegion> regions = atlas.findRegions(getRegionName(playerType));
-        Animation animation = new Animation((1 / 20f), regions);
+        Animation animation = new Animation((1 / 30f), regions);
         animation.setPlayMode(Animation.PlayMode.NORMAL);
 
         Bridge bridge = new Bridge(animation);
@@ -234,35 +234,6 @@ public class GameFieldUi {
     // Вспомогательный метод для получения Y центра CellImage
     private float getCellCenterY(CellImage cellImage) {
         return cellImage.getY() + cellImage.getHeight() / 2f;
-    }
-
-    // Переписываем основные методы размещения моста
-    private float getBridgeX(CellImage fromImage, CellImage toImage) {
-        float centerX1 = getCellCenterX(fromImage);
-        float centerX2 = getCellCenterX(toImage);
-        // Координата X середины между центрами ячеек
-        return (centerX1 + centerX2) / 2f;
-    }
-
-    private float getBridgeY(CellImage fromImage, CellImage toImage) {
-        float centerY1 = getCellCenterY(fromImage);
-        float centerY2 = getCellCenterY(toImage);
-        // Координата Y середины между центрами ячеек
-        return (centerY1 + centerY2) / 2f;
-    }
-
-    private float getRotation(Cell from, Cell to) {
-        if (to.getY() > from.getY()) {
-            return 0f;
-        } else if (to.getY() < from.getY()) {
-            return 180f;
-        } else if (to.getX() > from.getX()) {
-            return 270f;
-        } else if (to.getX() < from.getX()) {
-            return -180f;
-        }
-
-        return 0f;
     }
 
     private String getRegionName(PlayerColorType playerType) {

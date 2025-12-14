@@ -21,7 +21,7 @@
         "y": 6,
         "player": {
           "id": 1,
-          "playerColorType": "VIOLET",
+          "playerColorType": "BROWN",
           "userType": "COMPUTER"
         }
       },
@@ -46,7 +46,7 @@
         "y": 3,
         "player": {
           "id": 1,
-          "playerColorType": "VIOLET",
+          "playerColorType": "BROWN",
           "userType": "COMPUTER"
         }
       },
@@ -84,7 +84,7 @@
         "y": 2,
         "player": {
           "id": 1,
-          "playerColorType": "VIOLET",
+          "playerColorType": "BROWN",
           "userType": "COMPUTER"
         }
       },
@@ -159,7 +159,7 @@
         "y": 2,
         "player": {
           "id": 1,
-          "playerColorType": "VIOLET",
+          "playerColorType": "BROWN",
           "userType": "COMPUTER"
         }
       },
@@ -184,7 +184,7 @@
         "y": 6,
         "player": {
           "id": 1,
-          "playerColorType": "VIOLET",
+          "playerColorType": "BROWN",
           "userType": "COMPUTER"
         }
       },
@@ -202,7 +202,7 @@
         "y": 1,
         "player": {
           "id": 1,
-          "playerColorType": "VIOLET",
+          "playerColorType": "BROWN",
           "userType": "COMPUTER"
         }
       },
@@ -256,7 +256,7 @@
         "y": 4,
         "player": {
           "id": 1,
-          "playerColorType": "VIOLET",
+          "playerColorType": "BROWN",
           "userType": "COMPUTER"
         }
       },

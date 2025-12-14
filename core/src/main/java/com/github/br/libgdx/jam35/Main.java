@@ -35,7 +35,7 @@ public class Main extends Game implements ScreenLoader {
         context.getGameModel().initEmptyGrid();
 
         mainMenuScreen = new MainMenuScreen(context, this);
-        quizScreen = new GameFieldScreen(context, GameType.QUIZ);
+        quizScreen = new GameFieldScreen(context, GameType.QUIZ, this);
         editorScreen = new EditorScreen(context, this);
 
         loadMainMenu();
