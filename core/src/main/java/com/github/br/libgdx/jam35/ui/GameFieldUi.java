@@ -30,16 +30,21 @@ public class GameFieldUi {
 
     public void initGrid(int paddingUp, Stage stage, Grid modelGrid) {
         this.paddingUp = paddingUp;
-        this.cells = createGrid(paddingUp, stage, modelGrid);
+        this.cells = (cells == null) ? createGrid(paddingUp, stage, modelGrid) : updateGridByModel(modelGrid);
     }
 
-    public void updateGrid() {
-        for (CellImage[] row : cells) {
-            for (CellImage cellImage : row) {
-                Cell model = cellImage.getModel();
-                cellImage.setPlayerColor(model.getPlayer());
+    public CellImage[][] updateGridByModel(Grid modelGrid) {
+        Cell[][] grid = modelGrid.getGrid();
+        for (Cell[] row : grid) {
+            for (Cell cell : row) {
+                CellImage cellImage = cells[cell.getX()][cell.getY()];
+                cellImage.setSelectType(CellImageType.NONE);
+                cellImage.setModel(cell);
+                cellImage.setPlayerColor(cell.getPlayer());
             }
         }
+
+        return this.cells;
     }
 
     public boolean isOurCell(CellImage currentCell, Player playerWhoDoStep) {

@@ -178,7 +178,7 @@ public class EditorScreen implements Screen, GameModel.Listener {
             return;
         }
 
-        gameFieldUi.updateGrid();
+        gameFieldUi.updateGridByModel(modelGrid);
         if (model.isGameEnd()) {
             // переход к следующему уровню по менюшке
             Player winner = model.getWinnerPlayer();
