@@ -68,7 +68,7 @@ public class MainMenuScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        ScreenUtils.clear(0f, 0f, 0f, 1f);
+        ScreenUtils.clear(51f / 255f, 204f / 255f, 255f / 255f, 1f);
         stage.act(delta);
         stage.draw();
     }

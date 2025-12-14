@@ -78,7 +78,7 @@ public class UiFsm {
         try {
             gameModel.step(modelFrom, modelTo);
         } catch (IllegalArgumentException e) {
-            UiUtils.createWindow(stage, skin, "You need jump!", "OK", new ChangeListener() {
+            UiUtils.createWindow(stage, skin, "You need to jump!", "OK", new ChangeListener() {
                 @Override
                 public void changed(final ChangeEvent event, final Actor actor) {
                 }
