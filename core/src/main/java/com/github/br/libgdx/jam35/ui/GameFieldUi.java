@@ -1,8 +1,7 @@
 package com.github.br.libgdx.jam35.ui;
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
@@ -145,12 +144,15 @@ public class GameFieldUi {
 
     private CellImage createCell(Cell cell, float x, float y) {
         AssetManager assetManager = context.getAssetManager();
+        TextureAtlas atlas = assetManager.get(Res.CLOUDS_AND_BRIDGES);
 
         CellImage image = new CellImage(
             cell,
-            new TextureRegion(assetManager.get(Res.CELL, Texture.class)),
-            new TextureRegion(assetManager.get(Res.SELECTED_CELL, Texture.class)),
-            new TextureRegion(assetManager.get(Res.FUTURE_CELL, Texture.class))
+            atlas.findRegion(Res.Cloud.EMPTY),
+            atlas.findRegion(Res.Cloud.YELLOW),
+            atlas.findRegion(Res.Cloud.VIOLET),
+            atlas.findRegion(Res.Cloud.BLUE),
+            atlas.findRegion(Res.Cloud.BROWN)
         );
         image.setPosition(x, y);
 

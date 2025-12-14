@@ -22,7 +22,7 @@ public class EditorScreen implements Screen, GameModel.Listener {
 
     private static final int PADDING_UP = -10;
 
-    private GameContext context;
+    private final GameContext context;
 
     private Stage stage;
     private Skin skin;
@@ -150,8 +150,8 @@ public class EditorScreen implements Screen, GameModel.Listener {
     private static void resetGameModel(GameModel gameModel) {
         gameModel.reset();
         gameModel.initEmptyGrid();
-        gameModel.addPlayer(PlayerColorType.WHITE, UserType.HUMAN);
-        gameModel.addPlayer(PlayerColorType.BLACK, UserType.COMPUTER);
+        gameModel.addPlayer(PlayerColorType.YELLOW, UserType.HUMAN);
+        gameModel.addPlayer(PlayerColorType.VIOLET, UserType.COMPUTER);
         gameModel.setCurrentPlayer(0);
         gameModel.setNew(true);
     }
@@ -210,7 +210,7 @@ public class EditorScreen implements Screen, GameModel.Listener {
 
     @Override
     public void render(float delta) {
-        ScreenUtils.clear(0f, 0f, 0f, 1f);
+        ScreenUtils.clear(51f / 255f, 204f / 255f, 255f / 255f, 1f);
         stage.act(delta);
         stage.draw();
     }

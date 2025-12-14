@@ -5,6 +5,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -52,9 +53,7 @@ public class Main extends Game implements ScreenLoader {
         assetManager.setLoader(Skin.class, new FreeTypeSkinLoader(assetManager.getFileHandleResolver()));
         assetManager.setLoader(BitmapFont.class, new FreetypeFontLoader(assetManager.getFileHandleResolver()));
 
-        assetManager.load(Res.CELL, Texture.class);
-        assetManager.load(Res.FUTURE_CELL, Texture.class);
-        assetManager.load(Res.SELECTED_CELL, Texture.class);
+        assetManager.load(Res.CLOUDS_AND_BRIDGES, TextureAtlas.class);
         assetManager.load(Res.SKIN, Skin.class);
 
         assetManager.finishLoading();
@@ -65,9 +64,8 @@ public class Main extends Game implements ScreenLoader {
         super.dispose();
 
         AssetManager assetManager = context.getAssetManager();
-        assetManager.unload(Res.CELL);
-        assetManager.unload(Res.FUTURE_CELL);
-        assetManager.unload(Res.SELECTED_CELL);
+        assetManager.unload(Res.CLOUDS_AND_BRIDGES);
+        //assetManager.unload(Res.MAIN_MENU_SCREEN);
     }
 
     @Override
