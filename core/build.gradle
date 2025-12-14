@@ -2,7 +2,15 @@
 eclipse.project.name = appName + '-core'
 
 dependencies {
+  api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
   api "com.badlogicgames.gdx:gdx:$gdxVersion"
+
+  // scene composer
+  implementation 'com.github.raeleus.TenPatch:tenpatch:5.2.3'
+  implementation 'com.github.raeleus.stripe:stripe:2.0.0'
+  implementation 'com.github.raeleus.stripe:colorpicker:2.0.0'
+  implementation 'com.github.raeleus.stripe:freetype:2.0.0'
+  // scene composer
 
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"

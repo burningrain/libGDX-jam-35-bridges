@@ -1,0 +1,16 @@
+{
+"characters": "",
+"size": 32,
+"hinting": "AutoMedium",
+"color": "white",
+"colorValue": -33686017,
+"gamma": 1.8,
+"renderCount": 2,
+"borderWidth": 1,
+"borderColor": "border",
+"borderColorValue": 10092543,
+"borderGamma": 1.8,
+"kerning": true,
+"minFilter": "Nearest",
+"magFilter": "Nearest"
+}

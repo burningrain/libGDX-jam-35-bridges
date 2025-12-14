@@ -1,0 +1,34 @@
+
+jam_35_skin.png
+size: 2048, 2048
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+button
+  rotate: false
+  xy: 1, 327
+  size: 198, 126
+  orig: 198, 126
+  offset: 0, 0
+  index: -1
+button_click
+  rotate: false
+  xy: 1027, 1097
+  size: 198, 126
+  orig: 198, 126
+  offset: 0, 0
+  index: -1
+button_hover
+  rotate: false
+  xy: 1, 199
+  size: 198, 126
+  orig: 198, 126
+  offset: 0, 0
+  index: -1
+main_menu_background
+  rotate: false
+  xy: 1, 455
+  size: 1024, 768
+  orig: 1024, 768
+  offset: 0, 0
+  index: -1

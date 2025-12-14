@@ -23,7 +23,7 @@ import com.github.br.libgdx.jam35.model.*;
 
 public class GameFieldScreen implements Screen, GameModel.Listener {
 
-    private static final int PADDING_UP = -12;
+    private static final int PADDING_UP = -30;
     public static final String LEVEL_TEXT = "LEVEL: ";
 
     private GameContext context;
@@ -85,7 +85,7 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
     @Override
     public void show() {
         stage = new Stage(context.getViewport());
-        skin = new Skin(Gdx.files.internal(Res.SKIN));
+        skin = context.getAssetManager().get(Res.SKIN);
 
         changeMode(this.type);
         if (GameType.EDITOR == this.type) {
@@ -119,7 +119,7 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
         gameModel.addListener(this);
 
         //TODO убрать в отдельный скрин позже
-        TextButton modeButton = createButton("RUNTIME", 950, 730);
+        TextButton modeButton = createButton("RUNTIME", 750, 730);
         modeButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -131,7 +131,7 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
         });
         stage.addActor(modeButton);
 
-        TextButton saveButton = createButton("SAVE", 950, 700);
+        TextButton saveButton = createButton("SAVE", 750, 700);
         saveButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -140,7 +140,7 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
         });
         stage.addActor(saveButton);
 
-        TextButton loadButton = createButton("LOAD", 950, 670);
+        TextButton loadButton = createButton("LOAD", 750, 670);
         loadButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -178,7 +178,7 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
     private Label createLevelLabel() {
         float width = stage.getViewport().getWorldWidth();
         float height = stage.getViewport().getWorldHeight();
-        float leftX = width / 2f - 22f;
+        float leftX = width / 2f - 120f;
         float leftY = height + PADDING_UP * 3.2f;
         Label levelLabel = new Label(LEVEL_TEXT, skin);
         levelLabel.setX(leftX);
@@ -217,7 +217,7 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
 
             levelNumber++;
 
-            Window window = new Window("YOU WIN!", skin, "border");
+            Window window = new Window("YOU WIN!", skin);
             window.defaults().pad(4f);
             //window.add("").row();
             final TextButton button = new TextButton("Next", skin);
