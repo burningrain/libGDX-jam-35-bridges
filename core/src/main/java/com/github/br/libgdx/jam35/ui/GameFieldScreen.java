@@ -83,6 +83,8 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
     public void show() {
         stage = new Stage(context.getViewport());
         skin = context.getAssetManager().get(Res.SKIN);
+        runtimeFsm.setStage(stage);
+        runtimeFsm.setSkin(skin);
 
         changeMode(this.type);
         showRuntime();
@@ -171,26 +173,12 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
 
             levelNumber++;
 
-            Window window = new Window("YOU WIN!", skin);
-            window.defaults().pad(4f);
-            //window.add("").row();
-            final TextButton button = new TextButton("Next", skin);
-            button.pad(8f);
-            button.addListener(new ChangeListener() {
+            UiUtils.createWindow(stage, skin, "YOU WIN!", "Next", new ChangeListener() {
                 @Override
                 public void changed(final ChangeEvent event, final Actor actor) {
-                    window.remove();
                     startLevel(levelNumber, context.getGameModel());
                 }
             });
-            window.add(button);
-            window.pack();
-            // We round the window position to avoid awkward half-pixel artifacts.
-            // Casting using (int) would also work.
-            window.setPosition(MathUtils.roundPositive(stage.getWidth() / 2f - window.getWidth() / 2f),
-                MathUtils.roundPositive(stage.getHeight() / 2f - window.getHeight() / 2f));
-            window.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(1f)));
-            stage.addActor(window);
         }
 
     }

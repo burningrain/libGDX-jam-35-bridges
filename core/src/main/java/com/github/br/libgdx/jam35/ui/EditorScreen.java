@@ -81,6 +81,8 @@ public class EditorScreen implements Screen, GameModel.Listener {
     public void show() {
         stage = new Stage(context.getViewport());
         skin = context.getAssetManager().get(Res.SKIN);
+        runtimeFsm.setStage(stage);
+        runtimeFsm.setSkin(skin);
 
         changeMode(this.type);
         showEditor();
