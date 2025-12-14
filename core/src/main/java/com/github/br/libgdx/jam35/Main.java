@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.br.libgdx.jam35.model.GameModel;
+import com.github.br.libgdx.jam35.ui.EditorScreen;
 import com.github.br.libgdx.jam35.ui.GameFieldScreen;
 import com.github.br.libgdx.jam35.ui.GameType;
 import com.github.br.libgdx.jam35.ui.MainMenuScreen;
@@ -22,7 +23,7 @@ public class Main extends Game implements ScreenLoader {
 
     private MainMenuScreen mainMenuScreen;
     private GameFieldScreen quizScreen;
-    private GameFieldScreen editorScreen;
+    private EditorScreen editorScreen;
 
     @Override
     public void create() {
@@ -33,8 +34,8 @@ public class Main extends Game implements ScreenLoader {
         context.getGameModel().initEmptyGrid();
 
         mainMenuScreen = new MainMenuScreen(context, this);
-        quizScreen = new GameFieldScreen(context, GameType.RUNTIME);
-        editorScreen = new GameFieldScreen(context, GameType.EDITOR);
+        quizScreen = new GameFieldScreen(context, GameType.QUIZ);
+        editorScreen = new EditorScreen(context, this);
 
         loadMainMenu();
     }

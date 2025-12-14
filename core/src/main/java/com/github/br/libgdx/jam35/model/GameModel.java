@@ -63,11 +63,6 @@ public class GameModel {
     public void step(Cell from, Cell to) {
         validator.validationStep(grid, from, to);
 
-        // todo не забыть удалить
-        String stepLog = "\nfrom [" + from.getX() + "; " + from.getY() + "], type [" + from.getPlayer() + "]" +
-            "\nto [" + to.getX() + "; " + to.getY() + "], type [" + to.getPlayer() + "]";
-        System.out.println(stepLog);
-
         WasJump wasJump = new WasJump();
         Array<Cell> possibleStepsForCell = getPossibleStepsForCell(from, wasJump);
         // проверяем, что сходили куда можно сходить

@@ -7,7 +7,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
@@ -16,12 +15,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.github.br.libgdx.jam35.GameContext;
 import com.github.br.libgdx.jam35.Res;
+import com.github.br.libgdx.jam35.ScreenLoader;
 import com.github.br.libgdx.jam35.model.*;
 
-public class GameFieldScreen implements Screen, GameModel.Listener {
+public class EditorScreen implements Screen, GameModel.Listener {
 
-    private static final int PADDING_UP = -30;
-    public static final String LEVEL_TEXT = "LEVEL: ";
+    private static final int PADDING_UP = -10;
 
     private GameContext context;
 
@@ -32,9 +31,7 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
     private final UiFsm runtimeFsm;
 
     private GameType type;
-    private Label levelLabel;
-
-    private byte levelNumber = 0;
+    private final ScreenLoader screenLoader;
 
     private final ClickListener cellListener = new ClickListener() {
         @Override
@@ -70,11 +67,12 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
         }
     };
 
-    public GameFieldScreen(GameContext context, GameType type) {
+    public EditorScreen(GameContext context, ScreenLoader screenLoader) {
         this.context = context;
+        this.screenLoader = screenLoader;
         this.gameFieldUi = new GameFieldUi(context);
         this.runtimeFsm = new UiFsm(gameFieldUi, context);
-        this.type = type;
+        this.type = GameType.EDITOR;
 
         runtimeFsm.reset();
     }
@@ -85,7 +83,7 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
         skin = context.getAssetManager().get(Res.SKIN);
 
         changeMode(this.type);
-        showRuntime();
+        showEditor();
 
         int currentWidth = Gdx.graphics.getWidth();
         int currentHeight = Gdx.graphics.getHeight();
@@ -100,15 +98,51 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
         this.type = type;
     }
 
-    private void showRuntime() {
-        levelLabel = createLevelLabel();
-        stage.addActor(levelLabel);
-
+    private void showEditor() {
         GameModel gameModel = context.getGameModel();
-        startLevel(levelNumber, gameModel);
+        resetGameModel(gameModel);
 
         update(gameModel);
         gameModel.addListener(this);
+
+        TextButton modeButton = createButton("RUNTIME", 750, 570);
+        modeButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                type = (GameType.EDITOR == type) ? GameType.QUIZ : GameType.EDITOR;
+                String buttonText = (GameType.EDITOR == type) ? "RUNTIME" : "EDITOR";
+                modeButton.setText(buttonText);
+                changeMode(type);
+            }
+        });
+        stage.addActor(modeButton);
+
+        TextButton saveButton = createButton("SAVE", 750, 420);
+        saveButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                context.getGameModel().saveGrid("levels/level_2.json");
+            }
+        });
+        stage.addActor(saveButton);
+
+        TextButton loadButton = createButton("LOAD", 750, 270);
+        loadButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                context.getGameModel().loadGrid("levels/level_2.json");
+            }
+        });
+        stage.addActor(loadButton);
+
+        TextButton backToMenuButton = createButton("BACK", 750, 70);
+        backToMenuButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                screenLoader.loadMainMenu();
+            }
+        });
+        stage.addActor(backToMenuButton);
 
         Gdx.input.setInputProcessor(stage);
     }
@@ -120,25 +154,6 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
         gameModel.addPlayer(PlayerColorType.BLACK, UserType.COMPUTER);
         gameModel.setCurrentPlayer(0);
         gameModel.setNew(true);
-    }
-
-    private void startLevel(byte levelNumber, GameModel gameModel) {
-        levelLabel.setText(LEVEL_TEXT + (levelNumber + 1));
-        resetGameModel(gameModel);
-        gameModel.loadGrid("levels/level_" + levelNumber + ".json");
-        gameModel.start();
-    }
-
-    private Label createLevelLabel() {
-        float width = stage.getViewport().getWorldWidth();
-        float height = stage.getViewport().getWorldHeight();
-        float leftX = width / 2f - 120f;
-        float leftY = height + PADDING_UP * 3.2f;
-        Label levelLabel = new Label(LEVEL_TEXT, skin);
-        levelLabel.setX(leftX);
-        levelLabel.setY(leftY);
-
-        return levelLabel;
     }
 
     private TextButton createButton(String title, int x, int y) {
@@ -169,18 +184,16 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
             Player winner = model.getWinnerPlayer();
             System.out.println("game end. winner: " + winner);
 
-            levelNumber++;
-
-            Window window = new Window("YOU WIN!", skin);
+            Window window = new Window("Player" + winner.getPlayerType().name() + "WIN!", skin);
             window.defaults().pad(4f);
             //window.add("").row();
-            final TextButton button = new TextButton("Next", skin);
+            final TextButton button = new TextButton("OK", skin);
             button.pad(8f);
             button.addListener(new ChangeListener() {
                 @Override
                 public void changed(final ChangeEvent event, final Actor actor) {
+                    resetGameModel(context.getGameModel());
                     window.remove();
-                    startLevel(levelNumber, context.getGameModel());
                 }
             });
             window.add(button);
@@ -207,7 +220,7 @@ public class GameFieldScreen implements Screen, GameModel.Listener {
         if (width <= 0 || height <= 0) return;
 
         stage.getViewport().update(width, height, true);
-        gameFieldUi.updateGridPosition(0, stage);
+        gameFieldUi.updateGridPosition(-140, stage);
     }
 
     @Override

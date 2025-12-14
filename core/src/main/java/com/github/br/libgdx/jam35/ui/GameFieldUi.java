@@ -97,7 +97,7 @@ public class GameFieldUi {
         }
     }
 
-    public void updateGridPosition(Stage stage) {
+    public void updateGridPosition(int paddingX, Stage stage) {
         if (cells == null || cells.length == 0) {
             return;
         }
@@ -109,7 +109,7 @@ public class GameFieldUi {
         int gridHeight = cells[0].length;
 
         float cellSizeWithPadding = CELL_SIZE + CELL_PADDING_RIGHT;
-        float leftX = (viewportWidth - cellSizeWithPadding * gridWidth + CELL_PADDING_RIGHT) / 2f;
+        float leftX = paddingX + (viewportWidth - cellSizeWithPadding * gridWidth + CELL_PADDING_RIGHT) / 2f;
         float leftY = paddingUp + (viewportHeight - cellSizeWithPadding * gridHeight + CELL_PADDING_RIGHT) / 2f;
         for (int i = 0; i < gridWidth; i++) {
             for (int j = 0; j < gridHeight; j++) {
