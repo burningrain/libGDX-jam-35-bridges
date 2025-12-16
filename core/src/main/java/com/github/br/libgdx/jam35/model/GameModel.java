@@ -97,15 +97,17 @@ public class GameModel {
         // если был прыжок, то смотрим следующий ход - прыжок или нет
         // если прыжок ТОЙ ЖЕ ШАШКОЙ!!!, мы в середине удара находимся
         if (wasJump.wasJump && wasJump.currentCell == from) {
-            isNeedJump = isNeedToJump(grid, currentPlayer);
-            if (isNeedJump) {
-                // если идет удар той же шашкой(!), то ход не переходит к следующему игроку
-                // а текущий продолжает свой удар
-                WasJump willNextStepJump = new WasJump();
-                getPossibleStepsForCell(to, willNextStepJump);
-                if (willNextStepJump.currentCell == to) {
-                    return;
+            // если идет удар той же шашкой(!), то ход не переходит к следующему игроку
+            // а текущий продолжает свой удар
+            WasJump willNextStepJump = new WasJump();
+            Array<Cell> futureJump = getPossibleStepsForCell(to, willNextStepJump);
+            if (!futureJump.isEmpty()  && willNextStepJump.currentCell == to) {
+                // если всего один вариант, то делаем прыжок автоматически
+                if (futureJump.size == 1) {
+                    Cell nextCellAfterJump = futureJump.get(0);
+                    this.doStep(to, nextCellAfterJump);
                 }
+                return;
             }
         }
 
