@@ -9,6 +9,8 @@ import com.github.br.libgdx.jam35.model.step.ClearCellStep;
 import com.github.br.libgdx.jam35.model.step.MoveStep;
 import com.github.br.libgdx.jam35.model.step.Step;
 
+import java.util.HashMap;
+
 public class GameModel {
 
     private final Array<Listener> listeners = new Array<>();
@@ -27,7 +29,27 @@ public class GameModel {
     }
 
     public void start() {
+        updateCurrentGrid();
         playerManager.start();
+    }
+
+    private void updateCurrentGrid() {
+        HashMap<PlayerColorType, Player> playersMap = new HashMap<>();
+        int playersCount = playerManager.getPlayersCount();
+        for (int i = 0; i < playersCount; i++) {
+            Player player = playerManager.getPlayer(i);
+            playersMap.put(player.getPlayerColorType(), player);
+        }
+
+        Cell[][] cells = grid.getGrid();
+        for (Cell[] column : cells) {
+            for (Cell cell : column) {
+                Player cellPlayer = cell.getPlayer();
+                if (cellPlayer != Player.NULL_PLAYER) {
+                    cell.setPlayer(playersMap.get(cellPlayer.getPlayerColorType()));
+                }
+            }
+        }
     }
 
     public void reset() {

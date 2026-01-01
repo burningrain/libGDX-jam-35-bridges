@@ -5,9 +5,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
@@ -22,7 +20,6 @@ import com.github.br.libgdx.jam35.model.step.UiStepVisitor;
 public class GameFieldScreen2Players implements Screen, GameModel.Listener {
 
     private static final int PADDING_UP = -30;
-    public static final String LEVEL_TEXT = "LEVEL: ";
 
     private final GameContext context;
     private final ScreenLoader screenLoader;
@@ -34,8 +31,6 @@ public class GameFieldScreen2Players implements Screen, GameModel.Listener {
     private final UiFsm runtimeFsm;
     private UiStepVisitor uiStepVisitor;
 
-    private GameType type;
-
     private final ClickListener cellListener = new ClickListener() {
         @Override
         public void clicked(InputEvent event, float x, float y) {
@@ -43,45 +38,13 @@ public class GameFieldScreen2Players implements Screen, GameModel.Listener {
             runtimeFsm.handle(currentCell);
         }
     };
-    private final ClickListener editorListener = new ClickListener() {
-        @Override
-        public void clicked(InputEvent event, float x, float y) {
-            CellImage currentCell = (CellImage) event.getTarget();
-            Cell cellModel = currentCell.getModel();
 
-            GameModel gameModel = context.getGameModel();
-            int playersCount = gameModel.getPlayersCount();
-            int playerId;
-            Player player = cellModel.getPlayer();
-            if (player == Player.NULL_PLAYER) {
-                playerId = -1;
-            } else {
-                playerId = player.getId();
-            }
-
-            if (playerId == (playersCount - 1)) {
-                playerId = -1;
-            } else {
-                playerId++;
-            }
-
-            cellModel.setPlayer((playerId == -1) ? Player.NULL_PLAYER : gameModel.getPlayer(playerId));
-            currentCell.setPlayerColor(cellModel.getPlayer());
-        }
-    };
-
-    private boolean isFourPlayers;
-
-    public GameFieldScreen2Players(GameContext context, GameType type, ScreenLoader screenLoader, boolean isFourPlayers) {
+    public GameFieldScreen2Players(GameContext context, ScreenLoader screenLoader) {
         this.context = context;
         this.gameFieldUi = new GameFieldUi(context);
         uiStepVisitor = new UiStepVisitor(gameFieldUi);
         this.runtimeFsm = new UiFsm(gameFieldUi, context);
-        this.type = type;
         this.screenLoader = screenLoader;
-        this.isFourPlayers = isFourPlayers;
-
-        runtimeFsm.reset();
     }
 
     @Override
@@ -91,7 +54,7 @@ public class GameFieldScreen2Players implements Screen, GameModel.Listener {
         runtimeFsm.setStage(stage);
         runtimeFsm.setSkin(skin);
 
-        changeMode(this.type);
+        runtimeFsm.reset();
         showRuntime();
 
         int currentWidth = Gdx.graphics.getWidth();
@@ -99,86 +62,30 @@ public class GameFieldScreen2Players implements Screen, GameModel.Listener {
         resize(currentWidth, currentHeight);
     }
 
-    public void changeMode(GameType type) {
-        runtimeFsm.reset();
-
-        ClickListener currentListener = (GameType.EDITOR == type) ? editorListener : cellListener;
-        gameFieldUi.changeListener(currentListener);
-        this.type = type;
-    }
-
     private void showRuntime() {
-
         GameModel gameModel = context.getGameModel();
-        startLevel(gameModel);
+        resetGameModel(gameModel);
+        setLevelSettings(gameModel);
+        gameModel.start();
 
         update(gameModel);
+        gameFieldUi.changeListener(cellListener);
         gameModel.addListener(this);
 
         Gdx.input.setInputProcessor(stage);
     }
 
+    protected void setLevelSettings(GameModel gameModel) {
+        gameModel.loadGrid("levels/level_2_players.json");
+        gameModel.addPlayer(PlayerColorType.BLUE, UserType.HUMAN);
+        gameModel.addPlayer(PlayerColorType.BROWN, UserType.HUMAN);
+        gameModel.setCurrentPlayer(1);
+    }
+
     private void resetGameModel(GameModel gameModel) {
         gameModel.reset();
         gameModel.initEmptyGrid();
-        gameModel.addPlayer(PlayerColorType.BLUE, UserType.HUMAN);
-        gameModel.addPlayer(PlayerColorType.BROWN, UserType.HUMAN);
-        if (this.isFourPlayers) {
-            gameModel.addPlayer(PlayerColorType.YELLOW, UserType.HUMAN);
-            gameModel.addPlayer(PlayerColorType.VIOLET, UserType.HUMAN);
-        }
-
-        gameModel.setCurrentPlayer(0);
         gameModel.setNew(true);
-    }
-
-    private static PlayerColorType getComputerPlayerByLevel(int levelNumber) {
-        switch (levelNumber) {
-            case 0:
-            case 1:
-            case 2:
-                return PlayerColorType.VIOLET;
-            case 3:
-            case 4:
-            case 5:
-                return PlayerColorType.BROWN;
-            case 6:
-            case 7:
-            case 8:
-                return PlayerColorType.BLUE;
-            default:
-                throw new IllegalArgumentException("levelNumber is not supported: " + levelNumber);
-        }
-    }
-
-    private void startLevel(GameModel gameModel) {
-        resetGameModel(gameModel);
-        if (isFourPlayers) {
-            gameModel.loadGrid("levels/level_4_players.json");
-        } else {
-            gameModel.loadGrid("levels/level_2_players.json");
-        }
-
-        gameModel.start();
-    }
-
-    private Label createLevelLabel() {
-        float width = stage.getViewport().getWorldWidth();
-        float height = stage.getViewport().getWorldHeight();
-        float leftX = width / 2f - 120f;
-        float leftY = height + PADDING_UP * 3.2f;
-        Label levelLabel = new Label(LEVEL_TEXT, skin);
-        levelLabel.setX(leftX);
-        levelLabel.setY(leftY);
-
-        return levelLabel;
-    }
-
-    private TextButton createButton(String title, int x, int y) {
-        TextButton modeButton = new TextButton(title, skin);
-        modeButton.setX(x);
-        modeButton.setY(y);
-        return modeButton;
     }
 
     @Override
@@ -192,7 +99,6 @@ public class GameFieldScreen2Players implements Screen, GameModel.Listener {
         if (model.isNew()) {
             model.setNew(false);
             gameFieldUi.initGrid(PADDING_UP, stage, modelGrid);
-            changeMode(type);
             return;
         }
 

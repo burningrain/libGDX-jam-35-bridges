@@ -3,7 +3,6 @@ package com.github.br.libgdx.jam35;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader;
@@ -11,11 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.br.libgdx.jam35.model.GameModel;
-import com.github.br.libgdx.jam35.ui.EditorScreen;
-import com.github.br.libgdx.jam35.ui.GameFieldScreen;
-import com.github.br.libgdx.jam35.ui.GameFieldScreen2Players;
-import com.github.br.libgdx.jam35.ui.GameType;
-import com.github.br.libgdx.jam35.ui.MainMenuScreen;
+import com.github.br.libgdx.jam35.ui.*;
 import com.ray3k.stripe.FreeTypeSkinLoader;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
@@ -40,8 +35,8 @@ public class Main extends Game implements ScreenLoader {
         mainMenuScreen = new MainMenuScreen(context, this);
         quizScreen = new GameFieldScreen(context, GameType.QUIZ, this);
         editorScreen = new EditorScreen(context, this);
-        gameFieldScreen2Players = new GameFieldScreen2Players(context, GameType.QUIZ, this, false);
-        gameFieldScreen4Players = new GameFieldScreen2Players(context, GameType.QUIZ, this, true);
+        gameFieldScreen2Players = new GameFieldScreen2Players(context, this);
+        gameFieldScreen4Players = new GameFieldScreen4Players(context, this);
 
         loadMainMenu();
     }
@@ -97,4 +92,5 @@ public class Main extends Game implements ScreenLoader {
     public void load4Players() {
         setScreen(gameFieldScreen4Players);
     }
+
 }
