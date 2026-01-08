@@ -103,8 +103,9 @@ public class GameModel {
         from.setPlayer(Player.NULL_PLAYER);
         to.setPlayer(currentPlayer);
         if (wasJump.wasJump) {
-            wasJump.midCell.setPlayer(Player.NULL_PLAYER);
-            currentSteps.add(new ClearCellStep(wasJump.midCell.copy()));
+            Cell midCell = stepResolver.getMidCell(grid, from, to);
+            midCell.setPlayer(Player.NULL_PLAYER);
+            currentSteps.add(new ClearCellStep(midCell.copy()));
         }
         notifyListeners();
 

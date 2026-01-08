@@ -81,4 +81,28 @@ public class StepResolver {
         return true;
     }
 
+    public Cell getMidCell(Grid grid, Cell from, Cell to) {
+        int x;
+        if (from.getX() == to.getX()) {
+            // перемещения по x не было
+            x = from.getX();
+        } else if (from.getX() > to.getX()) {
+            x = from.getX() - 1;
+        } else {
+            x = from.getX() + 1;
+        }
+
+        int y;
+        if (from.getY() == to.getY()) {
+            // перемещения по y не было
+            y = from.getY();
+        } else if (from.getY() > to.getY()) {
+            y = from.getY() - 1;
+        } else {
+            y = from.getY() + 1;
+        }
+
+        return grid.getGrid()[x][y];
+    }
+
 }
