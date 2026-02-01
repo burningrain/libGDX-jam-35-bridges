@@ -10,6 +10,10 @@ import com.github.br.libgdx.jam35.model.Cell;
 import com.github.br.libgdx.jam35.model.GameModel;
 import com.github.br.libgdx.jam35.model.Player;
 import com.github.br.libgdx.jam35.model.UserType;
+import com.github.br.libgdx.jam35.ui.utils.CellImage;
+import com.github.br.libgdx.jam35.ui.utils.CellImageType;
+import com.github.br.libgdx.jam35.ui.utils.GameFieldUi;
+import com.github.br.libgdx.jam35.ui.utils.UiUtils;
 
 public class UiFsm {
 

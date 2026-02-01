@@ -2,8 +2,8 @@ package com.github.br.libgdx.jam35.model.step;
 
 import com.badlogic.gdx.utils.Array;
 import com.github.br.libgdx.jam35.model.Player;
-import com.github.br.libgdx.jam35.ui.Bridge;
-import com.github.br.libgdx.jam35.ui.GameFieldUi;
+import com.github.br.libgdx.jam35.ui.utils.Bridge;
+import com.github.br.libgdx.jam35.ui.utils.GameFieldUi;
 
 public class UiStepVisitor {
 

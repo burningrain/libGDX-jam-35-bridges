@@ -1,4 +1,4 @@
-package com.github.br.libgdx.jam35.ui;
+package com.github.br.libgdx.jam35.ui.utils;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -10,6 +10,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 public class UiUtils {
+
+    public static TextButton createButton(Skin skin, String title, int x, int y) {
+        TextButton modeButton = new TextButton(title, skin);
+        modeButton.setX(x);
+        modeButton.setY(y);
+        return modeButton;
+    }
 
     public static Window createWindow(
         Stage stage,

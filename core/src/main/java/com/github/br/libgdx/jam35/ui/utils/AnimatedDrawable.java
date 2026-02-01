@@ -1,4 +1,4 @@
-package com.github.br.libgdx.jam35.ui;
+package com.github.br.libgdx.jam35.ui.utils;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Animation;

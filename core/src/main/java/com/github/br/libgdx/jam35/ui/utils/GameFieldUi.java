@@ -1,4 +1,4 @@
-package com.github.br.libgdx.jam35.ui;
+package com.github.br.libgdx.jam35.ui.utils;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -31,10 +31,18 @@ public class GameFieldUi {
         return cells == null;
     }
 
-    public void initGrid(int paddingUp, Stage stage, Grid modelGrid) {
+    public void initGrid(int paddingX, int paddingUp, Stage stage, Grid modelGrid) {
         this.paddingUp = paddingUp;
         this.stage = stage;
-        this.cells = (cells == null) ? createGrid(paddingUp, stage, modelGrid) : updateGridByModel(modelGrid);
+
+        if (cells != null) {
+            for (CellImage[] row : cells) {
+                for (CellImage cellImage : row) {
+                    cellImage.remove();
+                }
+            }
+        }
+        this.cells = createGrid(paddingX, paddingUp, stage, modelGrid);
     }
 
     public CellImage[][] updateGridByModel(Grid modelGrid) {
@@ -105,39 +113,14 @@ public class GameFieldUi {
         }
     }
 
-    public void updateGridPosition(int paddingX, Stage stage) {
-        if (cells == null || cells.length == 0) {
-            return;
-        }
-
-        float viewportWidth = stage.getWidth();
-        float viewportHeight = stage.getHeight();
-
-        int gridWidth = cells.length;
-        int gridHeight = cells[0].length;
-
-        float cellSizeWithPadding = CELL_SIZE + CELL_PADDING_RIGHT;
-        float leftX = paddingX + (viewportWidth - cellSizeWithPadding * gridWidth + CELL_PADDING_RIGHT) / 2f;
-        float leftY = paddingUp + (viewportHeight - cellSizeWithPadding * gridHeight + CELL_PADDING_RIGHT) / 2f;
-        for (int i = 0; i < gridWidth; i++) {
-            for (int j = 0; j < gridHeight; j++) {
-                CellImage image = cells[i][j];
-                if (image != null) {
-                    image.setPosition(leftX + i * cellSizeWithPadding,
-                        leftY + j * cellSizeWithPadding);
-                }
-            }
-        }
-    }
-
-    private CellImage[][] createGrid(int paddingUp, Stage stage, Grid modelGrid) {
+    private CellImage[][] createGrid(int paddingX, int paddingUp, Stage stage, Grid modelGrid) {
         Cell[][] grid = modelGrid.getGrid();
 
         float width = stage.getWidth();
         float height = stage.getHeight();
 
         float cellSize = CELL_SIZE + CELL_PADDING_RIGHT;
-        float leftX = (width - cellSize * grid.length + CELL_PADDING_RIGHT) / 2f;
+        float leftX = paddingX + (width - cellSize * grid.length + CELL_PADDING_RIGHT) / 2f;
         float leftY = paddingUp + (height - cellSize * grid[0].length + CELL_PADDING_RIGHT) / 2f;
 
         CellImage[][] result = new CellImage[grid.length][grid[0].length];

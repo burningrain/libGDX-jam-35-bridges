@@ -1,4 +1,4 @@
-package com.github.br.libgdx.jam35.ui;
+package com.github.br.libgdx.jam35.ui.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;

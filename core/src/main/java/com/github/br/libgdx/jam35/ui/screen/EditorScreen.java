@@ -1,4 +1,4 @@
-package com.github.br.libgdx.jam35.ui;
+package com.github.br.libgdx.jam35.ui.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -17,10 +17,15 @@ import com.github.br.libgdx.jam35.GameContext;
 import com.github.br.libgdx.jam35.Res;
 import com.github.br.libgdx.jam35.ScreenLoader;
 import com.github.br.libgdx.jam35.model.*;
+import com.github.br.libgdx.jam35.ui.utils.CellImage;
+import com.github.br.libgdx.jam35.ui.utils.GameFieldUi;
+import com.github.br.libgdx.jam35.ui.utils.GameType;
+import com.github.br.libgdx.jam35.ui.UiFsm;
 
 public class EditorScreen implements Screen, GameModel.Listener {
 
     private static final int PADDING_UP = -10;
+    public static final int PADDING_X = -140;
 
     private final GameContext context;
 
@@ -81,14 +86,16 @@ public class EditorScreen implements Screen, GameModel.Listener {
     public void show() {
         stage = new Stage(context.getViewport());
         skin = context.getAssetManager().get(Res.SKIN);
+
+        //TODO убрать прокидку UI в runtimeFSM
         runtimeFsm.setStage(stage);
         runtimeFsm.setSkin(skin);
 
-        changeMode(this.type);
         showEditor();
 
         int currentWidth = Gdx.graphics.getWidth();
         int currentHeight = Gdx.graphics.getHeight();
+
         resize(currentWidth, currentHeight);
     }
 
@@ -175,7 +182,7 @@ public class EditorScreen implements Screen, GameModel.Listener {
         // инициализация нового уровня / новой игры
         if (model.isNew()) {
             model.setNew(false);
-            gameFieldUi.initGrid(PADDING_UP, stage, modelGrid);
+            gameFieldUi.initGrid(PADDING_X, PADDING_UP, stage, modelGrid);
             changeMode(type);
             return;
         }
@@ -222,7 +229,6 @@ public class EditorScreen implements Screen, GameModel.Listener {
         if (width <= 0 || height <= 0) return;
 
         stage.getViewport().update(width, height, true);
-        gameFieldUi.updateGridPosition(-140, stage);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.github.br.libgdx.jam35.ui;
+package com.github.br.libgdx.jam35.ui.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
@@ -16,10 +17,15 @@ import com.github.br.libgdx.jam35.ScreenLoader;
 import com.github.br.libgdx.jam35.model.*;
 import com.github.br.libgdx.jam35.model.step.Step;
 import com.github.br.libgdx.jam35.model.step.UiStepVisitor;
+import com.github.br.libgdx.jam35.ui.utils.CellImage;
+import com.github.br.libgdx.jam35.ui.utils.GameFieldUi;
+import com.github.br.libgdx.jam35.ui.UiFsm;
+import com.github.br.libgdx.jam35.ui.utils.UiUtils;
 
 public class GameFieldScreen2Players implements Screen, GameModel.Listener {
 
-    private static final int PADDING_UP = -30;
+    private static final int PADDING_UP = -10;
+    private static final int PADDING_X = -140;
 
     private final GameContext context;
     private final ScreenLoader screenLoader;
@@ -29,7 +35,7 @@ public class GameFieldScreen2Players implements Screen, GameModel.Listener {
 
     private final GameFieldUi gameFieldUi;
     private final UiFsm runtimeFsm;
-    private UiStepVisitor uiStepVisitor;
+    private final UiStepVisitor uiStepVisitor;
 
     private final ClickListener cellListener = new ClickListener() {
         @Override
@@ -51,6 +57,8 @@ public class GameFieldScreen2Players implements Screen, GameModel.Listener {
     public void show() {
         stage = new Stage(context.getViewport());
         skin = context.getAssetManager().get(Res.SKIN);
+
+        //TODO
         runtimeFsm.setStage(stage);
         runtimeFsm.setSkin(skin);
 
@@ -59,6 +67,7 @@ public class GameFieldScreen2Players implements Screen, GameModel.Listener {
 
         int currentWidth = Gdx.graphics.getWidth();
         int currentHeight = Gdx.graphics.getHeight();
+
         resize(currentWidth, currentHeight);
     }
 
@@ -72,11 +81,20 @@ public class GameFieldScreen2Players implements Screen, GameModel.Listener {
         gameFieldUi.changeListener(cellListener);
         gameModel.addListener(this);
 
+        TextButton backToMenuButton = UiUtils.createButton(skin, "BACK", 750, 70);
+        backToMenuButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                screenLoader.loadMainMenu();
+            }
+        });
+        stage.addActor(backToMenuButton);
+
         Gdx.input.setInputProcessor(stage);
     }
 
     protected void setLevelSettings(GameModel gameModel) {
-        gameModel.loadGrid("levels/level_2_players.json");
+        gameModel.loadGrid("levels/2_players.json");
         gameModel.addPlayer(PlayerColorType.BLUE, UserType.HUMAN);
         gameModel.addPlayer(PlayerColorType.BROWN, UserType.HUMAN);
         gameModel.setCurrentPlayer(1);
@@ -98,7 +116,7 @@ public class GameFieldScreen2Players implements Screen, GameModel.Listener {
         // инициализация нового уровня / новой игры
         if (model.isNew()) {
             model.setNew(false);
-            gameFieldUi.initGrid(PADDING_UP, stage, modelGrid);
+            gameFieldUi.initGrid(PADDING_X, PADDING_UP, stage, modelGrid);
             return;
         }
 
@@ -145,7 +163,6 @@ public class GameFieldScreen2Players implements Screen, GameModel.Listener {
         if (width <= 0 || height <= 0) return;
 
         stage.getViewport().update(width, height, true);
-        gameFieldUi.updateGridPosition(0, stage);
     }
 
     @Override
