@@ -12,6 +12,10 @@ project(":lwjgl3") {
         jvmArgs.addAll("-Dfile.encoding=UTF8")
         sharedLibrary = false
         resources.autodetect()
+        javaLauncher = javaToolchains.launcherFor {
+          languageVersion = JavaLanguageVersion.of(17)
+          vendor = JvmVendorSpec.matching("GraalVM")
+        }
       }
     }
   }
