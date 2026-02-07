@@ -1,7 +1,6 @@
 package com.github.br.libgdx.jam35.ui.screen;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -18,21 +17,21 @@ import com.github.br.libgdx.jam35.Res;
 import com.github.br.libgdx.jam35.ScreenLoader;
 import com.github.br.libgdx.jam35.model.*;
 import com.github.br.libgdx.jam35.model.exception.GameException;
+import com.github.br.libgdx.jam35.ui.UiFsm;
 import com.github.br.libgdx.jam35.ui.utils.CellImage;
 import com.github.br.libgdx.jam35.ui.utils.GameFieldUi;
 import com.github.br.libgdx.jam35.ui.utils.GameType;
-import com.github.br.libgdx.jam35.ui.UiFsm;
 import com.github.br.libgdx.jam35.ui.utils.UiUtils;
 
-public class EditorScreen implements Screen, GameModel.Listener {
+public class EditorScreen implements GameScreen, GameModel.Listener {
 
     private static final int PADDING_UP = -10;
     public static final int PADDING_X = -140;
 
     private final GameContext context;
 
-    private Stage stage;
-    private Skin skin;
+    private final Stage stage;
+    private final Skin skin;
 
     private final GameFieldUi gameFieldUi;
     private final UiFsm runtimeFsm;
@@ -83,42 +82,14 @@ public class EditorScreen implements Screen, GameModel.Listener {
     };
 
     public EditorScreen(GameContext context, ScreenLoader screenLoader) {
+        this.stage = new Stage(context.getViewport());
+        this.skin = context.getAssetManager().get(Res.SKIN);
         this.context = context;
         this.screenLoader = screenLoader;
         this.gameFieldUi = new GameFieldUi(context);
         this.runtimeFsm = new UiFsm(gameFieldUi, context);
+
         this.type = GameType.EDITOR;
-
-        runtimeFsm.reset();
-    }
-
-    @Override
-    public void show() {
-        stage = new Stage(context.getViewport());
-        skin = context.getAssetManager().get(Res.SKIN);
-
-        showEditor();
-
-        int currentWidth = Gdx.graphics.getWidth();
-        int currentHeight = Gdx.graphics.getHeight();
-
-        resize(currentWidth, currentHeight);
-    }
-
-    public void changeMode(GameType type) {
-        runtimeFsm.reset();
-
-        ClickListener currentListener = (GameType.EDITOR == type) ? editorListener : cellListener;
-        gameFieldUi.changeListener(currentListener);
-        this.type = type;
-    }
-
-    private void showEditor() {
-        GameModel gameModel = context.getGameModel();
-        resetGameModel(gameModel);
-
-        update(gameModel);
-        gameModel.addListener(this);
 
         TextButton modeButton = createButton("RUNTIME", 750, 570);
         modeButton.addListener(new ClickListener() {
@@ -158,8 +129,24 @@ public class EditorScreen implements Screen, GameModel.Listener {
             }
         });
         stage.addActor(backToMenuButton);
+    }
 
-        Gdx.input.setInputProcessor(stage);
+    @Override
+    public void show() {
+        runtimeFsm.reset();
+        GameModel gameModel = context.getGameModel();
+        resetGameModel(gameModel);
+
+        update(gameModel);
+        gameModel.addListener(this);
+    }
+
+    private void changeMode(GameType type) {
+        runtimeFsm.reset();
+
+        ClickListener currentListener = (GameType.EDITOR == type) ? editorListener : cellListener;
+        gameFieldUi.changeListener(currentListener);
+        this.type = type;
     }
 
     private static void resetGameModel(GameModel gameModel) {
@@ -258,4 +245,8 @@ public class EditorScreen implements Screen, GameModel.Listener {
         skin.dispose();
     }
 
+    @Override
+    public InputProcessor getStage() {
+        return stage;
+    }
 }

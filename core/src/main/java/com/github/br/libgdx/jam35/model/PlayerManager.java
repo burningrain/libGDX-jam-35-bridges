@@ -60,6 +60,7 @@ public class PlayerManager {
     public void clear() {
         currentPlayer = null;
         winner = null;
+        currentPlayerNumber = 0;
         players.clear();
     }
 

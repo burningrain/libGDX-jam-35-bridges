@@ -1,7 +1,7 @@
 package com.github.br.libgdx.jam35.ui.screen;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -13,25 +13,22 @@ import com.github.br.libgdx.jam35.Res;
 import com.github.br.libgdx.jam35.ScreenLoader;
 import com.ray3k.stripe.scenecomposer.SceneComposerStageBuilder;
 
-public class MainMenuScreen implements Screen {
+public class MainMenuScreen implements GameScreen {
 
     private final ScreenLoader screenLoader;
     private final GameContext context;
-    private Stage stage;
-    private Skin skin;
+    private final Stage stage;
+    private final Skin skin;
 
     public MainMenuScreen(GameContext context, ScreenLoader screenLoader) {
         this.context = context;
         this.screenLoader = screenLoader;
-    }
 
-    @Override
-    public void show() {
         stage = new Stage(context.getViewport());
         skin = context.getAssetManager().get(Res.SKIN);
+
         SceneComposerStageBuilder builder = new SceneComposerStageBuilder();
         builder.build(stage, skin, Gdx.files.internal(Res.MAIN_MENU_SCREEN));
-        Gdx.input.setInputProcessor(stage);
 
         TextButton quizButton = stage.getRoot().findActor("quizBtn");
         quizButton.addListener(new ChangeListener() {
@@ -67,6 +64,10 @@ public class MainMenuScreen implements Screen {
     }
 
     @Override
+    public void show() {
+    }
+
+    @Override
     public void render(float delta) {
         ScreenUtils.clear(51f / 255f, 204f / 255f, 255f / 255f, 1f);
         stage.act(delta);
@@ -94,4 +95,8 @@ public class MainMenuScreen implements Screen {
     public void hide() {
     }
 
+    @Override
+    public InputProcessor getStage() {
+        return stage;
+    }
 }

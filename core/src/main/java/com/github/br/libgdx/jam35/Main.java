@@ -1,6 +1,7 @@
 package com.github.br.libgdx.jam35;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -11,7 +12,6 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.br.libgdx.jam35.model.GameModel;
 import com.github.br.libgdx.jam35.ui.screen.*;
-import com.github.br.libgdx.jam35.ui.utils.GameType;
 import com.ray3k.stripe.FreeTypeSkinLoader;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
@@ -65,33 +65,47 @@ public class Main extends Game implements ScreenLoader {
         super.dispose();
 
         AssetManager assetManager = context.getAssetManager();
-        assetManager.unload(Res.CLOUDS_AND_BRIDGES);
-        //assetManager.unload(Res.MAIN_MENU_SCREEN);
+        assetManager.dispose();
+
+        mainMenuScreen.dispose();
+        quizScreen.dispose();
+        editorScreen.dispose();
+        gameFieldScreen2Players.dispose();
+        gameFieldScreen4Players.dispose();
     }
 
     @Override
     public void loadMainMenu() {
-        setScreen(mainMenuScreen);
+        changeScreen(mainMenuScreen);
     }
 
     @Override
     public void loadQuiz() {
-        setScreen(quizScreen);
+        changeScreen(quizScreen);
     }
 
     @Override
     public void loadEditor() {
-        setScreen(editorScreen);
+        changeScreen(editorScreen);
     }
 
     @Override
     public void load2Players() {
-        setScreen(gameFieldScreen2Players);
+        changeScreen(gameFieldScreen2Players);
     }
 
     @Override
     public void load4Players() {
-        setScreen(gameFieldScreen4Players);
+        changeScreen(gameFieldScreen4Players);
+    }
+
+    private void changeScreen(GameScreen nextScreen) {
+        setScreen(nextScreen);
+        Gdx.input.setInputProcessor(nextScreen.getStage());
+
+        int currentWidth = Gdx.graphics.getWidth();
+        int currentHeight = Gdx.graphics.getHeight();
+        nextScreen.resize(currentWidth, currentHeight);
     }
 
 }

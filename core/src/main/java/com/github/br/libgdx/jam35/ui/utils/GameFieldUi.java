@@ -16,8 +16,6 @@ public class GameFieldUi {
     private static final int CELL_PADDING_RIGHT = 20;
     private static final float CELL_SIZE = 64f;
 
-    private int paddingUp;
-
     private final GameContext context;
 
     private CellImage[][] cells;
@@ -32,7 +30,6 @@ public class GameFieldUi {
     }
 
     public void initGrid(int paddingX, int paddingUp, Stage stage, Grid modelGrid) {
-        this.paddingUp = paddingUp;
         this.stage = stage;
 
         if (cells != null) {

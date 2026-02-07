@@ -8,7 +8,6 @@ import com.github.br.libgdx.jam35.model.UserType;
 
 public class GameFieldScreen4Players extends GameFieldScreen2Players {
 
-
     public GameFieldScreen4Players(GameContext context, ScreenLoader screenLoader) {
         super(context, screenLoader);
     }

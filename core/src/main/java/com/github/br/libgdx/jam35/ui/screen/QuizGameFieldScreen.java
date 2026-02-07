@@ -1,7 +1,6 @@
 package com.github.br.libgdx.jam35.ui.screen;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -20,6 +19,7 @@ import com.github.br.libgdx.jam35.model.Grid;
 import com.github.br.libgdx.jam35.model.PlayerColorType;
 import com.github.br.libgdx.jam35.model.UserType;
 import com.github.br.libgdx.jam35.model.exception.GameException;
+import com.github.br.libgdx.jam35.model.exception.LevelIsNotSupportedException;
 import com.github.br.libgdx.jam35.model.step.Step;
 import com.github.br.libgdx.jam35.model.step.UiStepVisitor;
 import com.github.br.libgdx.jam35.ui.UiFsm;
@@ -27,7 +27,7 @@ import com.github.br.libgdx.jam35.ui.utils.CellImage;
 import com.github.br.libgdx.jam35.ui.utils.GameFieldUi;
 import com.github.br.libgdx.jam35.ui.utils.UiUtils;
 
-public class QuizGameFieldScreen implements Screen, GameModel.Listener {
+public class QuizGameFieldScreen implements GameScreen, GameModel.Listener {
 
     private static final int PADDING_UP = -30;
     private static final int PADDING_X = -140;
@@ -36,14 +36,14 @@ public class QuizGameFieldScreen implements Screen, GameModel.Listener {
     private final GameContext context;
     private final ScreenLoader screenLoader;
 
-    private Stage stage;
-    private Skin skin;
+    private final Stage stage;
+    private final Skin skin;
 
     private final GameFieldUi gameFieldUi;
     private final UiFsm runtimeFsm;
     private final UiStepVisitor uiStepVisitor;
 
-    private Label levelLabel;
+    private final Label levelLabel;
 
     private byte currentLevelNumber = 0;
 
@@ -65,37 +65,16 @@ public class QuizGameFieldScreen implements Screen, GameModel.Listener {
 
     public QuizGameFieldScreen(GameContext context, ScreenLoader screenLoader) {
         this.context = context;
-        this.gameFieldUi = new GameFieldUi(context);
-        uiStepVisitor = new UiStepVisitor(gameFieldUi);
-        this.runtimeFsm = new UiFsm(gameFieldUi, context);
         this.screenLoader = screenLoader;
 
-        runtimeFsm.reset();
-    }
-
-    @Override
-    public void show() {
-        stage = new Stage(context.getViewport());
-        skin = context.getAssetManager().get(Res.SKIN);
-
-        showRuntime();
-
-        int currentWidth = Gdx.graphics.getWidth();
-        int currentHeight = Gdx.graphics.getHeight();
-
-        resize(currentWidth, currentHeight);
-    }
-
-    private void showRuntime() {
-        runtimeFsm.reset();
-
-        levelLabel = createLevelLabel();
+        this.skin = context.getAssetManager().get(Res.SKIN);
+        this.stage = new Stage(context.getViewport());
+        this.levelLabel = createLevelLabel();
         stage.addActor(levelLabel);
 
-        GameModel gameModel = context.getGameModel();
-        gameModel.addListener(this);
-
-        restart(gameModel);
+        this.gameFieldUi = new GameFieldUi(context);
+        this.uiStepVisitor = new UiStepVisitor(gameFieldUi);
+        this.runtimeFsm = new UiFsm(gameFieldUi, context);
 
         TextButton restartButton = UiUtils.createButton(skin, "RESTART", 750, 270);
         restartButton.addListener(new ClickListener() {
@@ -115,8 +94,15 @@ public class QuizGameFieldScreen implements Screen, GameModel.Listener {
             }
         });
         stage.addActor(backToMenuButton);
+    }
 
-        Gdx.input.setInputProcessor(stage);
+    @Override
+    public void show() {
+        runtimeFsm.reset();
+        GameModel gameModel = context.getGameModel();
+        gameModel.addListener(this);
+
+        restart(gameModel);
     }
 
     private void restart(GameModel gameModel) {
@@ -146,9 +132,9 @@ public class QuizGameFieldScreen implements Screen, GameModel.Listener {
                 return PlayerColorType.BROWN;
             case 6:
             case 7:
-            case 8:
                 return PlayerColorType.BLUE;
-            default: throw new IllegalArgumentException("levelNumber is not supported: " + levelNumber);
+            default:
+                throw new LevelIsNotSupportedException(levelNumber);
         }
     }
 
@@ -202,6 +188,7 @@ public class QuizGameFieldScreen implements Screen, GameModel.Listener {
                         UiUtils.createWindow(stage, skin, "THANK YOU FOR PLAYING!", "Menu", new ChangeListener() {
                             @Override
                             public void changed(final ChangeEvent event, final Actor actor) {
+                                currentLevelNumber = 0;
                                 screenLoader.loadMainMenu();
                             }
                         });
@@ -253,6 +240,11 @@ public class QuizGameFieldScreen implements Screen, GameModel.Listener {
 
         stage.dispose();
         skin.dispose();
+    }
+
+    @Override
+    public InputProcessor getStage() {
+        return stage;
     }
 
 }
