@@ -19,6 +19,7 @@ import com.github.br.libgdx.jam35.model.GameModel;
 import com.github.br.libgdx.jam35.model.Grid;
 import com.github.br.libgdx.jam35.model.PlayerColorType;
 import com.github.br.libgdx.jam35.model.UserType;
+import com.github.br.libgdx.jam35.model.exception.GameException;
 import com.github.br.libgdx.jam35.model.step.Step;
 import com.github.br.libgdx.jam35.model.step.UiStepVisitor;
 import com.github.br.libgdx.jam35.ui.UiFsm;
@@ -50,7 +51,15 @@ public class QuizGameFieldScreen implements Screen, GameModel.Listener {
         @Override
         public void clicked(InputEvent event, float x, float y) {
             CellImage currentCell = (CellImage) event.getTarget();
-            runtimeFsm.handle(currentCell);
+            try {
+                runtimeFsm.handle(currentCell);
+            } catch (GameException e) {
+                UiUtils.createWindow(stage, skin, e.getMessage(), "OK", new ChangeListener() {
+                    @Override
+                    public void changed(final ChangeEvent event, final Actor actor) {
+                    }
+                });
+            }
         }
     };
 
@@ -68,10 +77,6 @@ public class QuizGameFieldScreen implements Screen, GameModel.Listener {
     public void show() {
         stage = new Stage(context.getViewport());
         skin = context.getAssetManager().get(Res.SKIN);
-
-        //TODO убрать
-        runtimeFsm.setStage(stage);
-        runtimeFsm.setSkin(skin);
 
         showRuntime();
 

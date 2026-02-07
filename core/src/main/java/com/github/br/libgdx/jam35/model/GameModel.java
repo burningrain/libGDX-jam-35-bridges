@@ -5,6 +5,8 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
+import com.github.br.libgdx.jam35.model.exception.IncorrectStepException;
+import com.github.br.libgdx.jam35.model.exception.NeedToJumpException;
 import com.github.br.libgdx.jam35.model.step.ClearCellStep;
 import com.github.br.libgdx.jam35.model.step.MoveStep;
 import com.github.br.libgdx.jam35.model.step.Step;
@@ -89,14 +91,14 @@ public class GameModel {
         Array<Cell> possibleStepsForCell = getPossibleStepsForCell(from, wasJump);
         // проверяем, что сходили куда можно сходить
         if (!possibleStepsForCell.contains(to, true)) {
-            throw new IllegalArgumentException("incorrect to=[" + to.getX() + "; " + to.getY() + "], type [" + to.getPlayer() + "]");
+            throw new IncorrectStepException(to);
         }
 
         Player currentPlayer = playerManager.getCurrentPlayer();
         boolean isNeedJump = isNeedToJump(grid, currentPlayer);
         if (isNeedJump && !wasJump.wasJump) {
             // если прыгать нужно, а не прыгнули, значит ошибка
-            throw new IllegalArgumentException("need to jump");
+            throw new NeedToJumpException();
         }
 
         currentSteps.add(new MoveStep(currentPlayer, from.copy(), to.copy(), wasJump.wasJump));

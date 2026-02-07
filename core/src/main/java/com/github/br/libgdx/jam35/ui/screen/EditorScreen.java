@@ -17,10 +17,12 @@ import com.github.br.libgdx.jam35.GameContext;
 import com.github.br.libgdx.jam35.Res;
 import com.github.br.libgdx.jam35.ScreenLoader;
 import com.github.br.libgdx.jam35.model.*;
+import com.github.br.libgdx.jam35.model.exception.GameException;
 import com.github.br.libgdx.jam35.ui.utils.CellImage;
 import com.github.br.libgdx.jam35.ui.utils.GameFieldUi;
 import com.github.br.libgdx.jam35.ui.utils.GameType;
 import com.github.br.libgdx.jam35.ui.UiFsm;
+import com.github.br.libgdx.jam35.ui.utils.UiUtils;
 
 public class EditorScreen implements Screen, GameModel.Listener {
 
@@ -42,7 +44,15 @@ public class EditorScreen implements Screen, GameModel.Listener {
         @Override
         public void clicked(InputEvent event, float x, float y) {
             CellImage currentCell = (CellImage) event.getTarget();
-            runtimeFsm.handle(currentCell);
+            try {
+                runtimeFsm.handle(currentCell);
+            } catch (GameException e) {
+                UiUtils.createWindow(stage, skin, e.getMessage(), "OK", new ChangeListener() {
+                    @Override
+                    public void changed(final ChangeEvent event, final Actor actor) {
+                    }
+                });
+            }
         }
     };
     private final ClickListener editorListener = new ClickListener() {
@@ -86,10 +96,6 @@ public class EditorScreen implements Screen, GameModel.Listener {
     public void show() {
         stage = new Stage(context.getViewport());
         skin = context.getAssetManager().get(Res.SKIN);
-
-        //TODO убрать прокидку UI в runtimeFSM
-        runtimeFsm.setStage(stage);
-        runtimeFsm.setSkin(skin);
 
         showEditor();
 

@@ -1,9 +1,5 @@
 package com.github.br.libgdx.jam35.ui;
 
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.github.br.libgdx.jam35.GameContext;
 import com.github.br.libgdx.jam35.model.Cell;
@@ -13,7 +9,6 @@ import com.github.br.libgdx.jam35.model.UserType;
 import com.github.br.libgdx.jam35.ui.utils.CellImage;
 import com.github.br.libgdx.jam35.ui.utils.CellImageType;
 import com.github.br.libgdx.jam35.ui.utils.GameFieldUi;
-import com.github.br.libgdx.jam35.ui.utils.UiUtils;
 
 public class UiFsm {
 
@@ -30,10 +25,6 @@ public class UiFsm {
 
     private final GameContext context;
     private final GameFieldUi gameFieldUi;
-
-    // FIXME кривота, потом убрать
-    private Stage stage;
-    private Skin skin;
 
     public UiFsm(GameFieldUi gameFieldUi, GameContext context) {
         this.gameFieldUi = gameFieldUi;
@@ -88,15 +79,9 @@ public class UiFsm {
                 gameModel.doComputerStep(nextPlayer);
                 nextPlayer = gameModel.getCurrentPlayer();
             }
-        } catch (IllegalArgumentException e) {
-            UiUtils.createWindow(stage, skin, "You need to jump!", "OK", new ChangeListener() {
-                @Override
-                public void changed(final ChangeEvent event, final Actor actor) {
-                }
-            });
+        } finally {
+            currentFsmState = UiFsmStateType.SELECT_CELL_FROM;
         }
-
-        currentFsmState = UiFsmStateType.SELECT_CELL_FROM;
     }
 
     private void deselectCurrentSelectedCellAction() {
@@ -128,11 +113,4 @@ public class UiFsm {
         from = null;
     }
 
-    public void setStage(Stage stage) {
-        this.stage = stage;
-    }
-
-    public void setSkin(Skin skin) {
-        this.skin = skin;
-    }
 }

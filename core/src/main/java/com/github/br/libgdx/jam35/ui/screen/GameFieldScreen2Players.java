@@ -15,6 +15,8 @@ import com.github.br.libgdx.jam35.GameContext;
 import com.github.br.libgdx.jam35.Res;
 import com.github.br.libgdx.jam35.ScreenLoader;
 import com.github.br.libgdx.jam35.model.*;
+import com.github.br.libgdx.jam35.model.exception.GameException;
+import com.github.br.libgdx.jam35.model.exception.NeedToJumpException;
 import com.github.br.libgdx.jam35.model.step.Step;
 import com.github.br.libgdx.jam35.model.step.UiStepVisitor;
 import com.github.br.libgdx.jam35.ui.utils.CellImage;
@@ -41,7 +43,15 @@ public class GameFieldScreen2Players implements Screen, GameModel.Listener {
         @Override
         public void clicked(InputEvent event, float x, float y) {
             CellImage currentCell = (CellImage) event.getTarget();
-            runtimeFsm.handle(currentCell);
+            try {
+                runtimeFsm.handle(currentCell);
+            } catch (GameException e) {
+                UiUtils.createWindow(stage, skin, e.getMessage(), "OK", new ChangeListener() {
+                    @Override
+                    public void changed(final ChangeEvent event, final Actor actor) {
+                    }
+                });
+            }
         }
     };
 
@@ -57,10 +67,6 @@ public class GameFieldScreen2Players implements Screen, GameModel.Listener {
     public void show() {
         stage = new Stage(context.getViewport());
         skin = context.getAssetManager().get(Res.SKIN);
-
-        //TODO
-        runtimeFsm.setStage(stage);
-        runtimeFsm.setSkin(skin);
 
         runtimeFsm.reset();
         showRuntime();
