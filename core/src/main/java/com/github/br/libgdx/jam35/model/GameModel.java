@@ -89,17 +89,10 @@ public class GameModel {
 
         WasJump wasJump = new WasJump();
         Array<Cell> possibleStepsForCell = getPossibleStepsForCell(from, wasJump);
-        // проверяем, что сходили куда можно сходить
-        if (!possibleStepsForCell.contains(to, true)) {
-            throw new IncorrectStepException(to);
-        }
+        validateStepTo(to, possibleStepsForCell); // проверяем, что сходили куда можно сходить
 
         Player currentPlayer = playerManager.getCurrentPlayer();
-        boolean isNeedJump = isNeedToJump(grid, currentPlayer);
-        if (isNeedJump && !wasJump.wasJump) {
-            // если прыгать нужно, а не прыгнули, значит ошибка
-            throw new NeedToJumpException();
-        }
+        validateNeedToJump(currentPlayer, wasJump); // проверяем, нужно ли бить
 
         currentSteps.add(new MoveStep(currentPlayer, from.copy(), to.copy(), wasJump.wasJump));
         from.setPlayer(Player.NULL_PLAYER);
@@ -112,6 +105,7 @@ public class GameModel {
         notifyListeners();
 
         // проверяем условия окончания игры
+        // TODO лучше завести счетчики на каждого игрока и уменьшать счетчики при боях
         ObjectSet<Player> activePlayers = getActivePlayersInTheGame(grid);
         if (activePlayers.size == 1) {
             playerManager.setWinner(activePlayers.iterator().next());
@@ -138,6 +132,20 @@ public class GameModel {
 
         // иначе переходим к следующему игроку
         playerManager.goToNextPlayer();
+    }
+
+    private void validateNeedToJump(Player currentPlayer, WasJump wasJump) {
+        boolean isNeedToJump = isNeedToJump(grid, currentPlayer);
+        if (isNeedToJump && !wasJump.wasJump) {
+            // если прыгать нужно, а не прыгнули, значит ошибка
+            throw new NeedToJumpException();
+        }
+    }
+
+    private void validateStepTo(Cell to, Array<Cell> possibleStepsForCell) {
+        if (!possibleStepsForCell.contains(to, true)) {
+            throw new IncorrectStepException(to);
+        }
     }
 
     private ObjectSet<Player> getActivePlayersInTheGame(Grid grid) {
