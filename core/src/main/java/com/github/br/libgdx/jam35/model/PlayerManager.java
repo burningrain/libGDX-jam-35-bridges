@@ -1,6 +1,7 @@
 package com.github.br.libgdx.jam35.model;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectSet;
 
 public class PlayerManager {
 
@@ -20,6 +21,21 @@ public class PlayerManager {
         }
         setCurrentPlayer(currentPlayerNumber);
         return getCurrentPlayer();
+    }
+
+    public ObjectSet<Player> getActivePlayersInTheGame(Grid grid) {
+        ObjectSet<Player> result = new ObjectSet<>();
+        Cell[][] cells = grid.getGrid();
+        for (Cell[] rows : cells) {
+            for (Cell row : rows) {
+                Player player = row.getPlayer();
+                if (player != null) {
+                    result.add(player);
+                }
+            }
+        }
+
+        return result;
     }
 
     public void addPlayer(PlayerColorType playerColorType, UserType userType) {
@@ -44,7 +60,7 @@ public class PlayerManager {
         this.winner = winner;
     }
 
-    public void start() {
+    public void validatePlayersBeforeStart() {
         if (players.isEmpty()) {
             throw new IllegalStateException("players must be registered");
         }

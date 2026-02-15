@@ -1,0 +1,149 @@
+package com.github.br.libgdx.jam35.model;
+
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectSet;
+import com.github.br.libgdx.jam35.model.step.ClearCellStep;
+import com.github.br.libgdx.jam35.model.step.MoveStep;
+
+public class FourPlayerStepHandler implements StepHandler {
+
+    private final GameModel gameModel;
+    private final PlayerManager playerManager;
+
+    private Player gambitPlayer = null;
+    private int roundPlayer = 0;
+
+    public FourPlayerStepHandler(GameModel gameModel, PlayerManager playerManager) {
+        this.gameModel = gameModel;
+        this.playerManager = playerManager;
+    }
+
+
+    @Override
+    public void doStep(Cell from, Cell to) {
+        Grid grid = gameModel.getGrid();
+        gameModel.validationStep(grid, from, to);
+
+        WasJump wasJump = new WasJump();
+        Array<Cell> possibleStepsForCell = gameModel.getPossibleStepsForCell(from, wasJump);
+        gameModel.validateStepTo(to, possibleStepsForCell); // проверяем, что сходили туда, куда можно сходить
+
+        Player currentPlayer = playerManager.getCurrentPlayer();
+        gameModel.validateNeedToJump(currentPlayer, wasJump); // проверяем, нужно ли бить
+
+        gameModel.addStepToLog(new MoveStep(currentPlayer, from.copy(), to.copy(), wasJump.wasJump));
+        from.setPlayer(Player.NULL_PLAYER);
+        to.setPlayer(currentPlayer);
+        if (wasJump.wasJump) {
+            Cell midCell = gameModel.getMidCell(grid, from, to);
+            midCell.setPlayer(Player.NULL_PLAYER);
+            gameModel.addStepToLog(new ClearCellStep(midCell.copy()));
+        }
+        gameModel.notifyListeners();
+
+        // проверяем условия окончания игры
+        // TODO лучше завести счетчики на каждого игрока и уменьшать счетчики при боях
+        ObjectSet<Player> activePlayers = playerManager.getActivePlayersInTheGame(grid);
+        if (activePlayers.size == 1) {
+            playerManager.setWinner(activePlayers.iterator().next());
+            gameModel.notifyListeners();
+            return;
+        }
+
+        // если был прыжок, то смотрим следующий ход - прыжок или нет
+        // если прыжок ТОЙ ЖЕ ШАШКОЙ!!!, мы в середине удара находимся
+        if (wasJump.wasJump && wasJump.currentCell == from) {
+            // если идет удар той же шашкой(!), то ход не переходит к следующему игроку
+            // а текущий продолжает свой удар
+            WasJump willNextStepJump = new WasJump();
+            Array<Cell> futureJump = gameModel.getPossibleStepsForCell(to, willNextStepJump);
+            if (!futureJump.isEmpty() && willNextStepJump.currentCell == to) {
+                // если всего один вариант, то делаем прыжок автоматически
+                if (futureJump.size == 1) {
+                    Cell nextCellAfterJump = futureJump.get(0);
+                    this.doStep(to, nextCellAfterJump);
+                }
+                return;
+            }
+        }
+
+        // проверяем, есть ли противник, которому надо бить твою шашку
+        int id = currentPlayer.getId();
+        int playersCount = playerManager.getPlayersCount();
+        WasJump gambitJump = getGambitJump(playersCount, id);
+        Player donorPlayer = null;
+        Player recipient = null;
+        if (gambitJump != null) {
+            donorPlayer = gambitJump.midCell.getPlayer();
+            recipient = gambitJump.currentCell.getPlayer();
+        }
+
+        int nextPlayer;
+        if (donorPlayer != null && currentPlayer == donorPlayer) {
+            // игрок жертвует шашку. после боя ход к первому пожертвовавшему должен вернуться
+            if (gambitPlayer == null) {
+                gambitPlayer = currentPlayer;
+            }
+            nextPlayer = recipient.getId();
+        } else {
+            // все бои окончены
+            if (!wasJump.wasJump || (wasJump.wasJump && gambitPlayer == null) || (wasJump.wasJump && currentPlayer == gambitPlayer)) {
+                // если бить никому не нужно или срубил текущий игрок, тогда просто переходим к следующему игроку
+                roundPlayer++;
+                if (roundPlayer > (playersCount - 1)) {
+                    roundPlayer = 0;
+                }
+                gambitPlayer = null;
+            }
+            // а если бить было нужно, то остаемся с текущим
+            nextPlayer = roundPlayer;
+        }
+        playerManager.setCurrentPlayer(nextPlayer);
+    }
+
+    private WasJump getGambitJump(int playersCount, int id) {
+        for (int playerId = 0; playerId < playersCount; playerId++) {
+            if (playerId == id) {
+                continue;
+            }
+
+            Player player = playerManager.getPlayer(playerId);
+            WasJump wasJump = gameModel.getWasJump(gameModel.getGrid(), player);
+            if (wasJump != null && wasJump.wasJump && wasJump.midCell != null) {
+                return wasJump;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void doComputerStep(Player player) {
+        Grid grid = gameModel.getGrid();
+        Array<ComputerStepVariants> variants = gameModel.getVariants(grid, player);
+
+        Cell from = null;
+        Cell to = null;
+        boolean isNeedJump = false;
+        for (ComputerStepVariants variant : variants) {
+            if (variant.getWasJump().wasJump) {
+                from = variant.getCell();
+                to = variant.getPossibleSteps().get(0);
+                isNeedJump = true;
+                break;
+            }
+        }
+        if (!isNeedJump) {
+            int variantIndex = (variants.size - 1 == 0) ? 0 : MathUtils.random.nextInt(variants.size - 1);
+            ComputerStepVariants computerStepVariant = variants.get(variantIndex);
+
+            Array<Cell> possibleSteps = computerStepVariant.getPossibleSteps();
+            int toIndex = (possibleSteps.size - 1 == 0) ? 0 : MathUtils.random.nextInt(possibleSteps.size - 1);
+            from = computerStepVariant.getCell();
+            to = possibleSteps.get(toIndex);
+        }
+
+        doStep(from, to);
+    }
+
+}

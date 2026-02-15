@@ -1,11 +1,14 @@
-package com.github.br.libgdx.jam35.model.step;
+package com.github.br.libgdx.jam35.ui;
 
 import com.badlogic.gdx.utils.Array;
 import com.github.br.libgdx.jam35.model.Player;
+import com.github.br.libgdx.jam35.model.step.ClearCellStep;
+import com.github.br.libgdx.jam35.model.step.MoveStep;
+import com.github.br.libgdx.jam35.model.step.StepVisitor;
 import com.github.br.libgdx.jam35.ui.utils.Bridge;
 import com.github.br.libgdx.jam35.ui.utils.GameFieldUi;
 
-public class UiStepVisitor {
+public class UiStepVisitor implements StepVisitor {
 
     private final GameFieldUi gameFieldUi;
 

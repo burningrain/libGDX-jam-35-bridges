@@ -14,14 +14,11 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.github.br.libgdx.jam35.GameContext;
 import com.github.br.libgdx.jam35.Res;
 import com.github.br.libgdx.jam35.ScreenLoader;
-import com.github.br.libgdx.jam35.model.GameModel;
-import com.github.br.libgdx.jam35.model.Grid;
-import com.github.br.libgdx.jam35.model.PlayerColorType;
-import com.github.br.libgdx.jam35.model.UserType;
+import com.github.br.libgdx.jam35.model.*;
 import com.github.br.libgdx.jam35.model.exception.GameException;
 import com.github.br.libgdx.jam35.model.exception.LevelIsNotSupportedException;
 import com.github.br.libgdx.jam35.model.step.Step;
-import com.github.br.libgdx.jam35.model.step.UiStepVisitor;
+import com.github.br.libgdx.jam35.ui.UiStepVisitor;
 import com.github.br.libgdx.jam35.ui.UiFsm;
 import com.github.br.libgdx.jam35.ui.utils.CellImage;
 import com.github.br.libgdx.jam35.ui.utils.GameFieldUi;
@@ -142,7 +139,7 @@ public class QuizGameFieldScreen implements GameScreen, GameModel.Listener {
         levelLabel.setText(LEVEL_TEXT + (levelNumber + 1));
         resetGameModel(gameModel, levelNumber);
         gameModel.loadGrid("levels/level_" + levelNumber + ".json");
-        gameModel.start();
+        gameModel.start(getGameMode());
     }
 
     private Label createLevelLabel() {
@@ -245,6 +242,10 @@ public class QuizGameFieldScreen implements GameScreen, GameModel.Listener {
     @Override
     public InputProcessor getStage() {
         return stage;
+    }
+
+    public GameModeType getGameMode() {
+        return GameModeType.TWO_PLAYERS;
     }
 
 }

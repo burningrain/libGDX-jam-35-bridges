@@ -16,7 +16,7 @@ import com.github.br.libgdx.jam35.ScreenLoader;
 import com.github.br.libgdx.jam35.model.*;
 import com.github.br.libgdx.jam35.model.exception.GameException;
 import com.github.br.libgdx.jam35.model.step.Step;
-import com.github.br.libgdx.jam35.model.step.UiStepVisitor;
+import com.github.br.libgdx.jam35.ui.UiStepVisitor;
 import com.github.br.libgdx.jam35.ui.UiFsm;
 import com.github.br.libgdx.jam35.ui.utils.CellImage;
 import com.github.br.libgdx.jam35.ui.utils.GameFieldUi;
@@ -80,10 +80,14 @@ public class GameFieldScreen2Players implements GameScreen, GameModel.Listener {
         GameModel gameModel = context.getGameModel();
         resetGameModel(gameModel);
         setLevelSettings(gameModel);
-        gameModel.start();
+        gameModel.start(getGameMode());
 
         update(gameModel);
         gameModel.addListener(this);
+    }
+
+    public GameModeType getGameMode() {
+        return GameModeType.TWO_PLAYERS;
     }
 
     protected void setLevelSettings(GameModel gameModel) {

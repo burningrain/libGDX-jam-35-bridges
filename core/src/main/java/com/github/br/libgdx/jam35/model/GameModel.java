@@ -2,13 +2,9 @@ package com.github.br.libgdx.jam35.model;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectSet;
 import com.github.br.libgdx.jam35.model.exception.IncorrectStepException;
 import com.github.br.libgdx.jam35.model.exception.NeedToJumpException;
-import com.github.br.libgdx.jam35.model.step.ClearCellStep;
-import com.github.br.libgdx.jam35.model.step.MoveStep;
 import com.github.br.libgdx.jam35.model.step.Step;
 
 import java.util.HashMap;
@@ -24,15 +20,19 @@ public class GameModel {
     private Grid grid = Grid.NULL_OBJECT;
     private boolean isNew = true;
 
+    private GameModeType gameMode;
+    private StepHandler stepHandler;
+
     private final Array<Step> currentSteps = new Array<>();
 
     public void initEmptyGrid() {
         this.setGrid(createEmptyGrid());
     }
 
-    public void start() {
+    public void start(GameModeType modeType) {
+        setGameMode(modeType);
         updateCurrentGrid();
-        playerManager.start();
+        playerManager.validatePlayersBeforeStart();
     }
 
     private void updateCurrentGrid() {
@@ -85,56 +85,14 @@ public class GameModel {
     }
 
     public void doStep(Cell from, Cell to) {
-        validator.validationStep(grid, from, to);
-
-        WasJump wasJump = new WasJump();
-        Array<Cell> possibleStepsForCell = getPossibleStepsForCell(from, wasJump);
-        validateStepTo(to, possibleStepsForCell); // проверяем, что сходили куда можно сходить
-
-        Player currentPlayer = playerManager.getCurrentPlayer();
-        validateNeedToJump(currentPlayer, wasJump); // проверяем, нужно ли бить
-
-        currentSteps.add(new MoveStep(currentPlayer, from.copy(), to.copy(), wasJump.wasJump));
-        from.setPlayer(Player.NULL_PLAYER);
-        to.setPlayer(currentPlayer);
-        if (wasJump.wasJump) {
-            Cell midCell = stepResolver.getMidCell(grid, from, to);
-            midCell.setPlayer(Player.NULL_PLAYER);
-            currentSteps.add(new ClearCellStep(midCell.copy()));
-        }
-        notifyListeners();
-
-        // проверяем условия окончания игры
-        // TODO лучше завести счетчики на каждого игрока и уменьшать счетчики при боях
-        ObjectSet<Player> activePlayers = getActivePlayersInTheGame(grid);
-        if (activePlayers.size == 1) {
-            playerManager.setWinner(activePlayers.iterator().next());
-            notifyListeners();
-            return;
-        }
-
-        // если был прыжок, то смотрим следующий ход - прыжок или нет
-        // если прыжок ТОЙ ЖЕ ШАШКОЙ!!!, мы в середине удара находимся
-        if (wasJump.wasJump && wasJump.currentCell == from) {
-            // если идет удар той же шашкой(!), то ход не переходит к следующему игроку
-            // а текущий продолжает свой удар
-            WasJump willNextStepJump = new WasJump();
-            Array<Cell> futureJump = getPossibleStepsForCell(to, willNextStepJump);
-            if (!futureJump.isEmpty()  && willNextStepJump.currentCell == to) {
-                // если всего один вариант, то делаем прыжок автоматически
-                if (futureJump.size == 1) {
-                    Cell nextCellAfterJump = futureJump.get(0);
-                    this.doStep(to, nextCellAfterJump);
-                }
-                return;
-            }
-        }
-
-        // иначе переходим к следующему игроку
-        playerManager.goToNextPlayer();
+        stepHandler.doStep(from, to);
     }
 
-    private void validateNeedToJump(Player currentPlayer, WasJump wasJump) {
+    public void doComputerStep(Player player) {
+        stepHandler.doComputerStep(player);
+    }
+
+    void validateNeedToJump(Player currentPlayer, WasJump wasJump) {
         boolean isNeedToJump = isNeedToJump(grid, currentPlayer);
         if (isNeedToJump && !wasJump.wasJump) {
             // если прыгать нужно, а не прыгнули, значит ошибка
@@ -142,28 +100,13 @@ public class GameModel {
         }
     }
 
-    private void validateStepTo(Cell to, Array<Cell> possibleStepsForCell) {
+    void validateStepTo(Cell to, Array<Cell> possibleStepsForCell) {
         if (!possibleStepsForCell.contains(to, true)) {
             throw new IncorrectStepException(to);
         }
     }
 
-    private ObjectSet<Player> getActivePlayersInTheGame(Grid grid) {
-        ObjectSet<Player> result = new ObjectSet<>();
-        Cell[][] cells = grid.getGrid();
-        for (Cell[] rows : cells) {
-            for (Cell row : rows) {
-                Player player = row.getPlayer();
-                if (player != null) {
-                    result.add(player);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    private boolean isNeedToJump(Grid grid, Player currentPlayer) {
+    boolean isNeedToJump(Grid grid, Player currentPlayer) {
         Array<ComputerStepVariants> variants = getVariants(grid, currentPlayer);
         for (ComputerStepVariants variant : variants) {
             if (variant.getWasJump().wasJump) {
@@ -173,34 +116,17 @@ public class GameModel {
         return false;
     }
 
-    public void doComputerStep(Player player) {
-        Array<ComputerStepVariants> variants = getVariants(grid, player);
-
-        Cell from = null;
-        Cell to = null;
-        boolean isNeedJump = false;
+    WasJump getWasJump(Grid grid, Player currentPlayer) {
+        Array<ComputerStepVariants> variants = getVariants(grid, currentPlayer);
         for (ComputerStepVariants variant : variants) {
             if (variant.getWasJump().wasJump) {
-                from = variant.getCell();
-                to = variant.getPossibleSteps().get(0);
-                isNeedJump = true;
-                break;
+                return variant.getWasJump();
             }
         }
-        if (!isNeedJump) {
-            int variantIndex = (variants.size - 1 == 0) ? 0 : MathUtils.random.nextInt(variants.size - 1);
-            ComputerStepVariants computerStepVariant = variants.get(variantIndex);
-
-            Array<Cell> possibleSteps = computerStepVariant.getPossibleSteps();
-            int toIndex = (possibleSteps.size - 1 == 0) ? 0 : MathUtils.random.nextInt(possibleSteps.size - 1);
-            from = computerStepVariant.getCell();
-            to = possibleSteps.get(toIndex);
-        }
-
-        doStep(from, to);
+        return null;
     }
 
-    private Array<ComputerStepVariants> getVariants(Grid grid, Player me) {
+    Array<ComputerStepVariants> getVariants(Grid grid, Player me) {
         Array<ComputerStepVariants> variants = new Array<>();
         Cell[][] cells = grid.getGrid();
         for (int x = 0; x < cells.length; x++) {
@@ -276,6 +202,36 @@ public class GameModel {
         return new Grid(cells);
     }
 
+    public void validationStep(Grid grid, Cell from, Cell to) {
+        validator.validationStep(grid, from, to);
+    }
+
+    public void addStepToLog(Step step) {
+        currentSteps.add(step);
+    }
+
+    public Cell getMidCell(Grid grid, Cell from, Cell to) {
+        return stepResolver.getMidCell(grid, from, to);
+    }
+
+    public void setGameMode(GameModeType gameMode) {
+        this.gameMode = gameMode;
+        switch (gameMode) {
+            case TWO_PLAYERS:
+                this.stepHandler = new TwoPlayerStepHandler(this, playerManager);
+                break;
+            case FOUR_PLAYERS:
+                this.stepHandler = new FourPlayerStepHandler(this, playerManager);
+                break;
+            default:
+                throw new IllegalArgumentException("gameMode=[" + gameMode + "] isn't supported");
+        }
+    }
+
+    public GameModeType getGameMode() {
+        return gameMode;
+    }
+
     // observer
     public interface Listener {
         void update(GameModel model);
@@ -294,7 +250,7 @@ public class GameModel {
         }
     }
 
-    private void notifyListeners() {
+    public void notifyListeners() {
         for (Listener listener : listeners) {
             listener.update(this);
         }

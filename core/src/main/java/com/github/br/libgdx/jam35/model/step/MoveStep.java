@@ -34,7 +34,7 @@ public class MoveStep implements Step {
     }
 
     @Override
-    public void visit(UiStepVisitor uiStepVisitor) {
+    public void visit(StepVisitor uiStepVisitor) {
         uiStepVisitor.visit(this);
     }
 
