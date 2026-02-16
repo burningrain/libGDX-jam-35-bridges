@@ -131,7 +131,7 @@ public class GameFieldUi {
         return result;
     }
 
-    private CellImage createCell(Cell cell, float x, float y) {
+    public CellImage createCell(Cell cell, float x, float y) {
         AssetManager assetManager = context.getAssetManager();
         TextureAtlas atlas = assetManager.get(Res.CLOUDS_AND_BRIDGES);
 
@@ -148,7 +148,7 @@ public class GameFieldUi {
         return image;
     }
 
-    public Bridge createBridge(Cell modelFrom, Cell modelTo, PlayerColorType playerType, boolean jump) {
+    public Bridge createBridge(Cell modelFrom, Cell modelTo, PlayerColorType playerType) {
         CellImage from = cells[modelFrom.getX()][modelFrom.getY()];
         CellImage to = cells[modelTo.getX()][modelTo.getY()];
 

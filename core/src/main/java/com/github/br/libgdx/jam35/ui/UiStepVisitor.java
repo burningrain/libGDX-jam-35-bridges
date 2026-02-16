@@ -68,8 +68,7 @@ public class UiStepVisitor implements StepVisitor {
                 bridge = gameFieldUi.createBridge(
                     moveStep.getFrom(),
                     moveStep.getTo(),
-                    moveStep.getCurrentPlayer().getPlayerColorType(),
-                    moveStep.isJump()
+                    moveStep.getCurrentPlayer().getPlayerColorType()
                 );
                 gameFieldUi.addToField(bridge);
             }

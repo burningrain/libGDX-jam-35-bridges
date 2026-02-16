@@ -4,6 +4,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -53,6 +54,9 @@ public class GameFieldScreen2Players implements GameScreen, GameModel.Listener {
         }
     };
 
+    private Label turnLabel;
+    private final CellImage currentPlayerColor;
+
     public GameFieldScreen2Players(GameContext context, ScreenLoader screenLoader) {
         this.stage = new Stage(context.getViewport());
         this.skin = context.getAssetManager().get(Res.SKIN);
@@ -62,6 +66,13 @@ public class GameFieldScreen2Players implements GameScreen, GameModel.Listener {
         this.uiStepVisitor = new UiStepVisitor(gameFieldUi);
         this.runtimeFsm = new UiFsm(gameFieldUi, context);
         this.screenLoader = screenLoader;
+
+        turnLabel = new Label("turn:", skin);
+        turnLabel.setX(788);
+        turnLabel.setY(360);
+        stage.addActor(turnLabel);
+        currentPlayerColor = gameFieldUi.createCell(new Cell(), 818, 310);
+        stage.addActor(currentPlayerColor);
 
         TextButton backToMenuButton = UiUtils.createButton(skin, "BACK", 750, 70);
         backToMenuButton.addListener(new ClickListener() {
@@ -84,6 +95,8 @@ public class GameFieldScreen2Players implements GameScreen, GameModel.Listener {
 
         update(gameModel);
         gameModel.addListener(this);
+
+        currentPlayerColor.setPlayerColor(gameModel.getCurrentPlayer());
     }
 
     public GameModeType getGameMode() {
@@ -128,6 +141,7 @@ public class GameFieldScreen2Players implements GameScreen, GameModel.Listener {
             @Override
             public void run() {
                 gameFieldUi.updateGridByModel(modelGrid);
+                currentPlayerColor.setPlayerColor(model.getCurrentPlayer());
                 if (model.isGameEnd()) {
                     // переход к следующему уровню по менюшке
                     Player winner = model.getWinnerPlayer();
