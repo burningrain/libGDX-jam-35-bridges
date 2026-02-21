@@ -14,8 +14,9 @@ public class GameModel {
     private final Array<Listener> listeners = new Array<>();
     private final GridLoader gridLoader = new GridLoader();
     private final Validator validator = new Validator();
-    private final StepResolver stepResolver = new StepResolver(validator);
     private final PlayerManager playerManager = new PlayerManager();
+    private final LastStepService lastStepService = new LastStepService();
+    private final StepResolver stepResolver = new StepResolver(validator, lastStepService);
 
     private Grid grid = Grid.NULL_OBJECT;
     private boolean isNew = true;
@@ -59,6 +60,7 @@ public class GameModel {
         isNew = true;
         currentSteps.clear();
         playerManager.clear();
+        lastStepService.clear();
     }
 
     public boolean isGameEnd() {
@@ -143,8 +145,12 @@ public class GameModel {
         return variants;
     }
 
+    void addLastStep(Player currentPlayer, Cell from, Cell to, boolean isWasJump) {
+        lastStepService.addLastStep(currentPlayer, from, to, isWasJump);
+    }
+
     public Array<Cell> getPossibleStepsForCell(Cell currentCell, WasJump wasJump) {
-        return stepResolver.getPossibleStepsForCell(grid, currentCell, wasJump);
+        return stepResolver.getPossibleStepsForCell(getCurrentPlayer(), grid, currentCell, wasJump);
     }
 
     public boolean isNew() {

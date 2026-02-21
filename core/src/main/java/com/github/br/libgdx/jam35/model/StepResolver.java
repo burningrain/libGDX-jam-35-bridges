@@ -5,13 +5,15 @@ import com.badlogic.gdx.utils.Array;
 public class StepResolver {
 
     private final Validator validator;
+    private final LastStepService lastStepService;
 
-    public StepResolver(Validator validator) {
+    public StepResolver(Validator validator, LastStepService lastStepService) {
         this.validator = validator;
+        this.lastStepService = lastStepService;
     }
 
     //TODO правильно вычислять возможные ячейки и ходы
-    public Array<Cell> getPossibleStepsForCell(Grid grid, Cell currentCell, WasJump wasJump) {
+    public Array<Cell> getPossibleStepsForCell(Player player, Grid grid, Cell currentCell, WasJump wasJump) {
         Array<Cell> result = new Array<>();
 
         int currentX = currentCell.getX();
@@ -49,22 +51,25 @@ public class StepResolver {
             return result;
         }
 
-        addStepIfPossible(currentX - 1, currentY, grid, currentCell, result); // налево
-        addStepIfPossible(currentX + 1, currentY, grid, currentCell, result); // направо
-        addStepIfPossible(currentX, currentY + 1, grid, currentCell, result); // вверх
-        addStepIfPossible(currentX, currentY - 1, grid, currentCell, result); // вниз
+        addStepIfPossible(player, currentX - 1, currentY, grid, currentCell, result); // налево
+        addStepIfPossible(player, currentX + 1, currentY, grid, currentCell, result); // направо
+        addStepIfPossible(player, currentX, currentY + 1, grid, currentCell, result); // вверх
+        addStepIfPossible(player, currentX, currentY - 1, grid, currentCell, result); // вниз
 
         return result;
     }
 
-    private boolean addStepIfPossible(int x, int y, Grid grid,
+    private boolean addStepIfPossible(Player player, int x, int y, Grid grid,
                                       Cell currentCell, Array<Cell> result) {
         if (!validator.isAbleToStep(grid, currentCell, x, y)) {
             return false;
         }
 
         Cell[][] cells = grid.getGrid();
-        result.add(cells[x][y]);
+        Cell to = cells[x][y];
+        if (!lastStepService.isReverseLastStep(player, currentCell, to)) {
+            result.add(to);
+        }
 
         return true;
     }

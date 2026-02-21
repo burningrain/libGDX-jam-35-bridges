@@ -32,6 +32,7 @@ public class FourPlayerStepHandler implements StepHandler {
         Player currentPlayer = playerManager.getCurrentPlayer();
         gameModel.validateNeedToJump(currentPlayer, wasJump); // проверяем, нужно ли бить
 
+        gameModel.addLastStep(currentPlayer, from, to, wasJump.wasJump);
         gameModel.addStepToLog(new MoveStep(currentPlayer, from.copy(), to.copy(), wasJump.wasJump));
         from.setPlayer(Player.NULL_PLAYER);
         to.setPlayer(currentPlayer);
