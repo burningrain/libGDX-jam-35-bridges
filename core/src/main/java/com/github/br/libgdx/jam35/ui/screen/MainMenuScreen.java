@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.github.br.libgdx.jam35.GameContext;
 import com.github.br.libgdx.jam35.Res;
 import com.github.br.libgdx.jam35.ScreenLoader;
+import com.github.br.libgdx.jam35.ui.utils.UiUtils;
 import com.ray3k.stripe.scenecomposer.SceneComposerStageBuilder;
 
 public class MainMenuScreen implements GameScreen {
@@ -19,8 +20,10 @@ public class MainMenuScreen implements GameScreen {
     private final GameContext context;
     private final Stage stage;
     private final Skin skin;
+    private final UiUtils uiUtils;
 
-    public MainMenuScreen(GameContext context, ScreenLoader screenLoader) {
+    public MainMenuScreen(UiUtils uiUtils, GameContext context, ScreenLoader screenLoader) {
+        this.uiUtils = uiUtils;
         this.context = context;
         this.screenLoader = screenLoader;
 

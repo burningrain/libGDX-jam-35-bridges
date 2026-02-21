@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.br.libgdx.jam35.model.GameModel;
 import com.github.br.libgdx.jam35.ui.screen.*;
+import com.github.br.libgdx.jam35.ui.utils.UiUtils;
 import com.ray3k.stripe.FreeTypeSkinLoader;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
@@ -33,11 +34,12 @@ public class Main extends Game implements ScreenLoader {
 
         context.getGameModel().initEmptyGrid();
 
-        mainMenuScreen = new MainMenuScreen(context, this);
-        quizScreen = new QuizGameFieldScreen(context, this);
-        editorScreen = new EditorScreen(context, this);
-        gameFieldScreen2Players = new GameFieldScreen2Players(context, this);
-        gameFieldScreen4Players = new GameFieldScreen4Players(context, this);
+        UiUtils uiUtils = new UiUtils(context.getAssetManager());
+        mainMenuScreen = new MainMenuScreen(uiUtils, context, this);
+        quizScreen = new QuizGameFieldScreen(uiUtils, context, this);
+        editorScreen = new EditorScreen(uiUtils, context, this);
+        gameFieldScreen2Players = new GameFieldScreen2Players(uiUtils, context, this);
+        gameFieldScreen4Players = new GameFieldScreen4Players(uiUtils, context, this);
 
         loadMainMenu();
     }

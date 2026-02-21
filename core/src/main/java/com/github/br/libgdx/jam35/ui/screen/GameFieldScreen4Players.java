@@ -6,11 +6,12 @@ import com.github.br.libgdx.jam35.model.GameModeType;
 import com.github.br.libgdx.jam35.model.GameModel;
 import com.github.br.libgdx.jam35.model.PlayerColorType;
 import com.github.br.libgdx.jam35.model.UserType;
+import com.github.br.libgdx.jam35.ui.utils.UiUtils;
 
 public class GameFieldScreen4Players extends GameFieldScreen2Players {
 
-    public GameFieldScreen4Players(GameContext context, ScreenLoader screenLoader) {
-        super(context, screenLoader);
+    public GameFieldScreen4Players(UiUtils uiUtils, GameContext context, ScreenLoader screenLoader) {
+        super(uiUtils, context, screenLoader);
     }
 
     protected void setLevelSettings(GameModel gameModel) {

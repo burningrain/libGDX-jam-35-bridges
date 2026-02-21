@@ -13,15 +13,17 @@ import com.github.br.libgdx.jam35.model.*;
 
 public class GameFieldUi {
 
-    private static final int CELL_PADDING_RIGHT = 20;
-    private static final float CELL_SIZE = 64f;
+    public static final int CELL_PADDING_RIGHT = 20;
+    public static final float CELL_SIZE = 64f;
 
+    private final UiUtils uiUtils;
     private final GameContext context;
 
     private CellImage[][] cells;
     private Stage stage;
 
-    public GameFieldUi(GameContext context) {
+    public GameFieldUi(UiUtils uiUtils, GameContext context) {
+        this.uiUtils = uiUtils;
         this.context = context;
     }
 
@@ -32,14 +34,22 @@ public class GameFieldUi {
     public void initGrid(int paddingX, int paddingUp, Stage stage, Grid modelGrid) {
         this.stage = stage;
 
-        if (cells != null) {
-            for (CellImage[] row : cells) {
-                for (CellImage cellImage : row) {
-                    cellImage.remove();
-                }
-            }
+        if (isAlreadyInit()) {
+            clean();
         }
         this.cells = createGrid(paddingX, paddingUp, stage, modelGrid);
+    }
+
+    private void clean() {
+        for (CellImage[] row : cells) {
+            for (CellImage cellImage : row) {
+                cellImage.remove();
+            }
+        }
+    }
+
+    private boolean isAlreadyInit() {
+        return cells != null;
     }
 
     public CellImage[][] updateGridByModel(Grid modelGrid) {
@@ -123,29 +133,12 @@ public class GameFieldUi {
         CellImage[][] result = new CellImage[grid.length][grid[0].length];
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[i].length; j++) {
-                CellImage image = createCell(grid[i][j], leftX + i * cellSize, leftY + j * cellSize);
+                CellImage image = uiUtils.createCell(grid[i][j], leftX + i * cellSize, leftY + j * cellSize);
                 stage.addActor(image);
                 result[i][j] = image;
             }
         }
         return result;
-    }
-
-    public CellImage createCell(Cell cell, float x, float y) {
-        AssetManager assetManager = context.getAssetManager();
-        TextureAtlas atlas = assetManager.get(Res.CLOUDS_AND_BRIDGES);
-
-        CellImage image = new CellImage(
-            cell,
-            atlas.findRegion(Res.Cloud.EMPTY),
-            atlas.findRegion(Res.Cloud.YELLOW),
-            atlas.findRegion(Res.Cloud.VIOLET),
-            atlas.findRegion(Res.Cloud.BLUE),
-            atlas.findRegion(Res.Cloud.BROWN)
-        );
-        image.setPosition(x, y);
-
-        return image;
     }
 
     public Bridge createBridge(Cell modelFrom, Cell modelTo, PlayerColorType playerType) {

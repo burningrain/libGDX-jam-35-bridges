@@ -46,7 +46,7 @@ public class EditorScreen implements GameScreen, GameModel.Listener {
             try {
                 runtimeFsm.handle(currentCell);
             } catch (GameException e) {
-                UiUtils.createWindow(stage, skin, e.getMessage(), "OK", new ChangeListener() {
+                uiUtils.createWindow(stage, skin, e.getMessage(), "OK", new ChangeListener() {
                     @Override
                     public void changed(final ChangeEvent event, final Actor actor) {
                     }
@@ -81,12 +81,15 @@ public class EditorScreen implements GameScreen, GameModel.Listener {
         }
     };
 
-    public EditorScreen(GameContext context, ScreenLoader screenLoader) {
+    private final UiUtils uiUtils;
+
+    public EditorScreen(UiUtils uiUtils, GameContext context, ScreenLoader screenLoader) {
+        this.uiUtils = uiUtils;
         this.stage = new Stage(context.getViewport());
         this.skin = context.getAssetManager().get(Res.SKIN);
         this.context = context;
         this.screenLoader = screenLoader;
-        this.gameFieldUi = new GameFieldUi(context);
+        this.gameFieldUi = new GameFieldUi(uiUtils, context);
         this.runtimeFsm = new UiFsm(gameFieldUi, context);
 
         this.type = GameType.EDITOR;

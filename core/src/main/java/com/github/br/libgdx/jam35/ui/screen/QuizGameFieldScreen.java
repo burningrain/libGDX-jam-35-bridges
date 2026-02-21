@@ -44,6 +44,7 @@ public class QuizGameFieldScreen implements GameScreen, GameModel.Listener {
 
     private byte currentLevelNumber = 0;
 
+    private final UiUtils uiUtils;
     private final ClickListener cellListener = new ClickListener() {
         @Override
         public void clicked(InputEvent event, float x, float y) {
@@ -51,7 +52,7 @@ public class QuizGameFieldScreen implements GameScreen, GameModel.Listener {
             try {
                 runtimeFsm.handle(currentCell);
             } catch (GameException e) {
-                UiUtils.createWindow(stage, skin, e.getMessage(), "OK", new ChangeListener() {
+                uiUtils.createWindow(stage, skin, e.getMessage(), "OK", new ChangeListener() {
                     @Override
                     public void changed(final ChangeEvent event, final Actor actor) {
                     }
@@ -60,7 +61,8 @@ public class QuizGameFieldScreen implements GameScreen, GameModel.Listener {
         }
     };
 
-    public QuizGameFieldScreen(GameContext context, ScreenLoader screenLoader) {
+    public QuizGameFieldScreen(UiUtils uiUtils, GameContext context, ScreenLoader screenLoader) {
+        this.uiUtils = uiUtils;
         this.context = context;
         this.screenLoader = screenLoader;
 
@@ -69,11 +71,11 @@ public class QuizGameFieldScreen implements GameScreen, GameModel.Listener {
         this.levelLabel = createLevelLabel();
         stage.addActor(levelLabel);
 
-        this.gameFieldUi = new GameFieldUi(context);
+        this.gameFieldUi = new GameFieldUi(uiUtils, context);
         this.uiStepVisitor = new UiStepVisitor(gameFieldUi);
         this.runtimeFsm = new UiFsm(gameFieldUi, context);
 
-        TextButton restartButton = UiUtils.createButton(skin, "RESTART", 750, 270);
+        TextButton restartButton = uiUtils.createButton(skin, "RESTART", 750, 270);
         restartButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -83,7 +85,7 @@ public class QuizGameFieldScreen implements GameScreen, GameModel.Listener {
         });
         stage.addActor(restartButton);
 
-        TextButton backToMenuButton = UiUtils.createButton(skin, "BACK", 750, 70);
+        TextButton backToMenuButton = uiUtils.createButton(skin, "BACK", 750, 70);
         backToMenuButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -182,7 +184,7 @@ public class QuizGameFieldScreen implements GameScreen, GameModel.Listener {
                     currentLevelNumber++;
 
                     if (currentLevelNumber == 8) { //TODO брать число уровней
-                        UiUtils.createWindow(stage, skin, "THANK YOU FOR PLAYING!", "Menu", new ChangeListener() {
+                        uiUtils.createWindow(stage, skin, "THANK YOU FOR PLAYING!", "Menu", new ChangeListener() {
                             @Override
                             public void changed(final ChangeEvent event, final Actor actor) {
                                 currentLevelNumber = 0;
@@ -190,7 +192,7 @@ public class QuizGameFieldScreen implements GameScreen, GameModel.Listener {
                             }
                         });
                     } else {
-                        UiUtils.createWindow(stage, skin, "YOU WIN!", "Next", new ChangeListener() {
+                        uiUtils.createWindow(stage, skin, "YOU WIN!", "Next", new ChangeListener() {
                             @Override
                             public void changed(final ChangeEvent event, final Actor actor) {
                                 restart(context.getGameModel());

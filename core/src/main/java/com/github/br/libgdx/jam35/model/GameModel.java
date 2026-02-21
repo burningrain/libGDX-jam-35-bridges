@@ -3,6 +3,8 @@ package com.github.br.libgdx.jam35.model;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.OrderedMap;
 import com.github.br.libgdx.jam35.model.exception.IncorrectStepException;
 import com.github.br.libgdx.jam35.model.exception.NeedToJumpException;
 import com.github.br.libgdx.jam35.model.step.Step;
@@ -17,6 +19,7 @@ public class GameModel {
     private final PlayerManager playerManager = new PlayerManager();
     private final LastStepService lastStepService = new LastStepService();
     private final StepResolver stepResolver = new StepResolver(validator, lastStepService);
+    private final PointsManager pointsManager = new PointsManager();
 
     private Grid grid = Grid.NULL_OBJECT;
     private boolean isNew = true;
@@ -31,9 +34,10 @@ public class GameModel {
     }
 
     public void start(GameModeType modeType) {
+        playerManager.validatePlayersBeforeStart();
         setGameMode(modeType);
         updateCurrentGrid();
-        playerManager.validatePlayersBeforeStart();
+        pointsManager.initPlayersCheckerAmount(getGrid());
     }
 
     private void updateCurrentGrid() {
@@ -58,9 +62,11 @@ public class GameModel {
     public void reset() {
         grid = Grid.NULL_OBJECT;
         isNew = true;
+
         currentSteps.clear();
         playerManager.clear();
         lastStepService.clear();
+        pointsManager.clear();
     }
 
     public boolean isGameEnd() {
@@ -236,6 +242,14 @@ public class GameModel {
 
     public GameModeType getGameMode() {
         return gameMode;
+    }
+
+    public void addPlayersPoints(Player currentPlayer, Player victim) {
+        pointsManager.addPoints(currentPlayer, victim);
+    }
+
+    public OrderedMap<Player, Integer> getPlayersPoints() {
+        return pointsManager.getPlayersPoints();
     }
 
     // observer

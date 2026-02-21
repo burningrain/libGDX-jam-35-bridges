@@ -21,6 +21,7 @@ import com.github.br.libgdx.jam35.ui.UiStepVisitor;
 import com.github.br.libgdx.jam35.ui.UiFsm;
 import com.github.br.libgdx.jam35.ui.utils.CellImage;
 import com.github.br.libgdx.jam35.ui.utils.GameFieldUi;
+import com.github.br.libgdx.jam35.ui.utils.PlayerPointsUi;
 import com.github.br.libgdx.jam35.ui.utils.UiUtils;
 
 public class GameFieldScreen2Players implements GameScreen, GameModel.Listener {
@@ -35,6 +36,7 @@ public class GameFieldScreen2Players implements GameScreen, GameModel.Listener {
     private Skin skin;
 
     private final GameFieldUi gameFieldUi;
+    private final PlayerPointsUi playerPointsUi;
     private final UiFsm runtimeFsm;
     private final UiStepVisitor uiStepVisitor;
 
@@ -45,7 +47,7 @@ public class GameFieldScreen2Players implements GameScreen, GameModel.Listener {
             try {
                 runtimeFsm.handle(currentCell);
             } catch (GameException e) {
-                UiUtils.createWindow(stage, skin, e.getMessage(), "OK", new ChangeListener() {
+                uiUtils.createWindow(stage, skin, e.getMessage(), "OK", new ChangeListener() {
                     @Override
                     public void changed(final ChangeEvent event, final Actor actor) {
                     }
@@ -54,27 +56,31 @@ public class GameFieldScreen2Players implements GameScreen, GameModel.Listener {
         }
     };
 
-    private Label turnLabel;
+    private final UiUtils uiUtils;
     private final CellImage currentPlayerColor;
+    private Label turnLabel;
 
-    public GameFieldScreen2Players(GameContext context, ScreenLoader screenLoader) {
+    public GameFieldScreen2Players(UiUtils uiUtils, GameContext context, ScreenLoader screenLoader) {
+        this.uiUtils = uiUtils;
         this.stage = new Stage(context.getViewport());
         this.skin = context.getAssetManager().get(Res.SKIN);
 
         this.context = context;
-        this.gameFieldUi = new GameFieldUi(context);
+        this.gameFieldUi = new GameFieldUi(uiUtils, context);
         this.uiStepVisitor = new UiStepVisitor(gameFieldUi);
         this.runtimeFsm = new UiFsm(gameFieldUi, context);
         this.screenLoader = screenLoader;
 
+        playerPointsUi = new PlayerPointsUi(uiUtils, context);
+
         turnLabel = new Label("turn:", skin);
         turnLabel.setX(788);
-        turnLabel.setY(360);
+        turnLabel.setY(240);
         stage.addActor(turnLabel);
-        currentPlayerColor = gameFieldUi.createCell(new Cell(), 818, 310);
+        currentPlayerColor = uiUtils.createCell(new Cell(), 818, 190); // разница по y в 50
         stage.addActor(currentPlayerColor);
 
-        TextButton backToMenuButton = UiUtils.createButton(skin, "BACK", 750, 70);
+        TextButton backToMenuButton = uiUtils.createButton(skin, "BACK", 750, 50);
         backToMenuButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -128,6 +134,8 @@ public class GameFieldScreen2Players implements GameScreen, GameModel.Listener {
             model.setNew(false);
             gameFieldUi.initGrid(PADDING_X, PADDING_UP, stage, modelGrid);
             gameFieldUi.changeListener(cellListener);
+
+            playerPointsUi.init(780, 300, stage, skin);
             return;
         }
 
@@ -141,13 +149,14 @@ public class GameFieldScreen2Players implements GameScreen, GameModel.Listener {
             @Override
             public void run() {
                 gameFieldUi.updateGridByModel(modelGrid);
+                playerPointsUi.update(model.getPlayersPoints());
                 currentPlayerColor.setPlayerColor(model.getCurrentPlayer());
                 if (model.isGameEnd()) {
                     // переход к следующему уровню по менюшке
                     Player winner = model.getWinnerPlayer();
 
                     if (winner != null) {
-                        UiUtils.createWindow(stage, skin,
+                        uiUtils.createWindow(stage, skin,
                             "Player '" + winner.getPlayerColorType() + "' WIN!", "Menu",
                             new ChangeListener() {
                                 @Override

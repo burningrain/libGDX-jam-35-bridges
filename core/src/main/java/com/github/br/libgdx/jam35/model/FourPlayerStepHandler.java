@@ -38,8 +38,10 @@ public class FourPlayerStepHandler implements StepHandler {
         to.setPlayer(currentPlayer);
         if (wasJump.wasJump) {
             Cell midCell = gameModel.getMidCell(grid, from, to);
+            Player victim = midCell.getPlayer();
             midCell.setPlayer(Player.NULL_PLAYER);
             gameModel.addStepToLog(new ClearCellStep(midCell.copy()));
+            gameModel.addPlayersPoints(currentPlayer, victim);
         }
         gameModel.notifyListeners();
 
