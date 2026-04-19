@@ -6,13 +6,19 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Array;
 import com.github.br.libgdx.jam35.GameContext;
 import com.github.br.libgdx.jam35.Res;
 import com.github.br.libgdx.jam35.model.Cell;
+import com.github.br.libgdx.jam35.model.GameModel;
+import com.github.br.libgdx.jam35.model.Player;
+import com.github.br.libgdx.jam35.model.UserType;
+import com.github.br.libgdx.jam35.ui.UiFsm;
+
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class UiUtils {
 
@@ -77,5 +83,61 @@ public class UiUtils {
         return window;
     }
 
+
+    public Window createSettingsWindow(
+        Stage stage,
+        Skin skin,
+        String header,
+        GameModel gameModel,
+        String buttonText,
+        Consumer<Array<Player>> okChangeListener
+    ) {
+        Window window = new Window(header, skin, "settings");
+        window.defaults().pad(4f);
+
+        Table table = new Table();
+
+        Array<Player> activePlayersInTheGame = gameModel.getActivePlayersInTheGame();
+        for (Player player : activePlayersInTheGame) {
+            CellImage cell = createCell(new Cell(), 818, 190);// разница по y в 50
+            cell.setPlayerColor(player);
+            table.add(cell);
+
+            SelectBox<UserType> selectBox = new SelectBox<>(skin);
+            selectBox.setItems(UserType.values());
+            selectBox.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    player.setUserType(selectBox.getSelected());
+                }
+            });
+            table.add(selectBox).spaceBottom(10);
+            table.row();
+        }
+
+        final TextButton button = new TextButton(buttonText, skin);
+        button.pad(8f);
+        button.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                window.remove();
+                okChangeListener.accept(activePlayersInTheGame);
+            }
+        });
+        table.row();
+        table.add(button).colspan(2);
+
+        window.add(table);
+        window.pack();
+        // We round the window position to avoid awkward half-pixel artifacts.
+        // Casting using (int) would also work.
+        window.setPosition(MathUtils.roundPositive(stage.getWidth() / 2f - window.getWidth() / 2f),
+            MathUtils.roundPositive(stage.getHeight() / 2f - window.getHeight() / 2f));
+        window.addAction(Actions.sequence(Actions.alpha(0f), Actions.fadeIn(1f)));
+
+        stage.addActor(window);
+
+        return window;
+    }
 
 }

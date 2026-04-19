@@ -73,14 +73,17 @@ public class UiFsm {
         currentFsmState = UiFsmStateType.STEP;
         try {
             gameModel.doStep(modelFrom, modelTo);
-
-            Player nextPlayer = gameModel.getCurrentPlayer();
-            while (!gameModel.isGameEnd() && UserType.COMPUTER == nextPlayer.getUserType()) {
-                gameModel.doComputerStep(nextPlayer);
-                nextPlayer = gameModel.getCurrentPlayer();
-            }
+            playComputer(gameModel);
         } finally {
             currentFsmState = UiFsmStateType.SELECT_CELL_FROM;
+        }
+    }
+
+    public void playComputer(GameModel gameModel) {
+        Player nextPlayer = gameModel.getCurrentPlayer();
+        while (!gameModel.isGameEnd() && UserType.COMPUTER == nextPlayer.getUserType()) {
+            gameModel.doComputerStep(nextPlayer);
+            nextPlayer = gameModel.getCurrentPlayer();
         }
     }
 

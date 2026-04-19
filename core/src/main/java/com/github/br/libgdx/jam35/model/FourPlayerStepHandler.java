@@ -148,10 +148,13 @@ public class FourPlayerStepHandler implements StepHandler {
             }
         }
         if (!isNeedJump) {
-            int variantIndex = (variants.size - 1 == 0) ? 0 : MathUtils.random.nextInt(variants.size - 1);
-            ComputerStepVariants computerStepVariant = variants.get(variantIndex);
-
-            Array<Cell> possibleSteps = computerStepVariant.getPossibleSteps();
+            Array<Cell> possibleSteps = null;
+            ComputerStepVariants computerStepVariant = null;
+            do {
+                int variantIndex = (variants.size - 1 == 0) ? 0 : MathUtils.random.nextInt(variants.size - 1);
+                computerStepVariant = variants.get(variantIndex);
+                possibleSteps = computerStepVariant.getPossibleSteps();
+            } while (possibleSteps.isEmpty());
             int toIndex = (possibleSteps.size - 1 == 0) ? 0 : MathUtils.random.nextInt(possibleSteps.size - 1);
             from = computerStepVariant.getCell();
             to = possibleSteps.get(toIndex);

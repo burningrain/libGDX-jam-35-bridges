@@ -6,29 +6,50 @@ filter: Linear, Linear
 repeat: none
 button
   rotate: false
-  xy: 1, 327
+  xy: 1, 359
   size: 198, 126
   orig: 198, 126
   offset: 0, 0
   index: -1
 button_click
   rotate: false
-  xy: 1027, 1097
+  xy: 1083, 1221
   size: 198, 126
   orig: 198, 126
   offset: 0, 0
   index: -1
 button_hover
   rotate: false
-  xy: 1, 199
+  xy: 1, 231
   size: 198, 126
   orig: 198, 126
   offset: 0, 0
   index: -1
+cloud_empty
+  rotate: false
+  xy: 1283, 1281
+  size: 66, 66
+  orig: 66, 66
+  offset: 0, 0
+  index: -1
 main_menu_background
   rotate: false
-  xy: 1, 455
-  size: 1024, 768
-  orig: 1024, 768
+  xy: 1, 487
+  size: 1080, 860
+  orig: 1080, 860
+  offset: 0, 0
+  index: -1
+settings
+  rotate: false
+  xy: 201, 401
+  size: 81, 84
+  orig: 81, 84
+  offset: 0, 0
+  index: -1
+settings_hover
+  rotate: false
+  xy: 1083, 1135
+  size: 81, 84
+  orig: 81, 84
   offset: 0, 0
   index: -1

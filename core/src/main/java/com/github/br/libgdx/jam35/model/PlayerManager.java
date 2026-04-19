@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.ObjectSet;
 
 public class PlayerManager {
 
-    private final Array<Player> players = new Array<>();
+    private Array<Player> players = new Array<>();
 
     private Player currentPlayer;
     private int currentPlayerNumber = 0;
@@ -86,6 +86,10 @@ public class PlayerManager {
 
     public Player getPlayer(int playerId) {
         return players.get(playerId);
+    }
+
+    public void setActivePlayers(Array<Player> players) {
+        this.players = players;
     }
 
 }

@@ -4,6 +4,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -23,6 +24,8 @@ import com.github.br.libgdx.jam35.ui.utils.CellImage;
 import com.github.br.libgdx.jam35.ui.utils.GameFieldUi;
 import com.github.br.libgdx.jam35.ui.utils.PlayerPointsUi;
 import com.github.br.libgdx.jam35.ui.utils.UiUtils;
+
+import java.util.function.Consumer;
 
 public class GameFieldScreen2Players implements GameScreen, GameModel.Listener {
 
@@ -88,6 +91,31 @@ public class GameFieldScreen2Players implements GameScreen, GameModel.Listener {
             }
         });
         stage.addActor(backToMenuButton);
+
+        ImageButton settings = new ImageButton(skin);
+        settings.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                uiUtils.createSettingsWindow(
+                    stage,
+                    skin,
+                    "Settings",
+                    context.getGameModel(),
+                    "OK",
+                    activePlayersInTheGame -> {
+                        GameModel gameModel = context.getGameModel();
+                        gameModel.setActivePlayers(activePlayersInTheGame);
+                        Player firstPlayer = activePlayersInTheGame.iterator().next();
+                        if (UserType.COMPUTER == firstPlayer.getUserType()) {
+                            runtimeFsm.playComputer(gameModel);
+                        }
+                    }
+                );
+            }
+        });
+        settings.setX(924);
+        settings.setY(668);
+        stage.addActor(settings);
     }
 
     @Override

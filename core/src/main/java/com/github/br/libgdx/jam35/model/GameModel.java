@@ -276,6 +276,10 @@ public class GameModel {
         roundQueueManager.init();
     }
 
+    public void setActivePlayers(Array<Player> activePlayersInTheGame) {
+        playerManager.setActivePlayers(activePlayersInTheGame);
+    }
+
     // observer
     public interface Listener {
         void update(GameModel model);
