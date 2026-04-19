@@ -1,11 +1,10 @@
 package com.github.br.libgdx.jam35.ui.screen;
 
+import com.badlogic.gdx.utils.Array;
 import com.github.br.libgdx.jam35.GameContext;
 import com.github.br.libgdx.jam35.ScreenLoader;
-import com.github.br.libgdx.jam35.model.GameModeType;
-import com.github.br.libgdx.jam35.model.GameModel;
-import com.github.br.libgdx.jam35.model.PlayerColorType;
-import com.github.br.libgdx.jam35.model.UserType;
+import com.github.br.libgdx.jam35.model.*;
+import com.github.br.libgdx.jam35.model.round.RoundStep;
 import com.github.br.libgdx.jam35.ui.utils.UiUtils;
 
 public class GameFieldScreen4Players extends GameFieldScreen2Players {
@@ -21,6 +20,21 @@ public class GameFieldScreen4Players extends GameFieldScreen2Players {
         gameModel.addPlayer(PlayerColorType.VIOLET, UserType.HUMAN);
         gameModel.addPlayer(PlayerColorType.YELLOW, UserType.HUMAN);
         gameModel.setCurrentPlayer(0);
+
+        gameModel.setRoundGenerator(() -> {
+            Array<RoundStep> roundSteps = new Array<>();
+            Array<Player> activePlayers = gameModel.getActivePlayersInTheGame();
+            for (Player activePlayer : activePlayers) {
+                roundSteps.add(
+                    new RoundStep(
+                        activePlayer.getId(),
+                        false,
+                        activePlayer.getId() == (activePlayers.size - 1))
+                );
+            }
+            return roundSteps;
+        });
+        gameModel.initRound();
     }
 
     @Override

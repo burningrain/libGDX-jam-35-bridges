@@ -2,7 +2,10 @@ package com.github.br.libgdx.jam35.model;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
+import com.badlogic.gdx.utils.OrderedMap;
+import com.github.br.libgdx.jam35.model.round.RoundQueueManager;
 import com.github.br.libgdx.jam35.model.step.ClearCellStep;
 import com.github.br.libgdx.jam35.model.step.MoveStep;
 
@@ -10,15 +13,15 @@ public class FourPlayerStepHandler implements StepHandler {
 
     private final GameModel gameModel;
     private final PlayerManager playerManager;
+    private final RoundQueueManager roundManager;
 
-    private Player gambitPlayer = null;
-    private int roundPlayer = 0;
+    private Player gambitPlayer = null; // игрок, начавший серию жертв
 
-    public FourPlayerStepHandler(GameModel gameModel, PlayerManager playerManager) {
+    public FourPlayerStepHandler(GameModel gameModel, PlayerManager playerManager, RoundQueueManager roundManager) {
         this.gameModel = gameModel;
         this.playerManager = playerManager;
+        this.roundManager = roundManager;
     }
-
 
     @Override
     public void doStep(Cell from, Cell to) {
@@ -52,6 +55,20 @@ public class FourPlayerStepHandler implements StepHandler {
             playerManager.setWinner(activePlayers.iterator().next());
             gameModel.notifyListeners();
             return;
+        } else if (activePlayers.size < playerManager.getPlayersCount()) {
+            OrderedMap<Player, Integer> playersPoints = gameModel.getPlayersPoints();
+            ObjectMap.Entry<Player, Integer> startEntry = playersPoints.iterator().next();
+            Player winner = startEntry.key;
+            int maxPoints = startEntry.value;
+            for (ObjectMap.Entry<Player, Integer> entry : playersPoints.iterator()) {
+                if (maxPoints < entry.value) {
+                    maxPoints = entry.value;
+                    winner = entry.key;
+                }
+            }
+            playerManager.setWinner(winner);
+            gameModel.notifyListeners();
+            return;
         }
 
         // если был прыжок, то смотрим следующий ход - прыжок или нет
@@ -75,34 +92,28 @@ public class FourPlayerStepHandler implements StepHandler {
         int id = currentPlayer.getId();
         int playersCount = playerManager.getPlayersCount();
         WasJump gambitJump = getGambitJump(playersCount, id);
-        Player donorPlayer = null;
-        Player recipient = null;
         if (gambitJump != null) {
-            donorPlayer = gambitJump.midCell.getPlayer();
-            recipient = gambitJump.currentCell.getPlayer();
+            Player donorPlayer = gambitJump.midCell.getPlayer();
+            if (id == donorPlayer.getId()) {
+                Player recipient = gambitJump.currentCell.getPlayer();
+                int currentStep = roundManager.getCurrentStep();
+                roundManager.insertNextStep(currentStep + 1, recipient.getId(), true);
+                if (gambitPlayer == null) {
+                    gambitPlayer = donorPlayer;
+                    roundManager.insertNextStep(currentStep + 2, donorPlayer.getId(), true);
+                }
+            }
+        } else {
+            gambitPlayer = null;
         }
 
         int nextPlayer;
-        if (donorPlayer != null && currentPlayer == donorPlayer) {
-            // игрок жертвует шашку. после боя ход к первому пожертвовавшему должен вернуться
-            if (gambitPlayer == null) {
-                gambitPlayer = currentPlayer;
-            }
-            nextPlayer = recipient.getId();
-        } else {
-            // все бои окончены
-            if (!wasJump.wasJump || (wasJump.wasJump && gambitPlayer == null) || (wasJump.wasJump && currentPlayer == gambitPlayer)) {
-                // если бить никому не нужно или срубил текущий игрок, тогда просто переходим к следующему игроку
-                roundPlayer++;
-                if (roundPlayer > (playersCount - 1)) {
-                    roundPlayer = 0;
-                }
-                gambitPlayer = null;
-            }
-            // а если бить было нужно, то остаемся с текущим
-            nextPlayer = roundPlayer;
-        }
-        playerManager.setCurrentPlayer(nextPlayer);
+        do {
+            roundManager.goToNextStep();
+            nextPlayer = roundManager.getCurrentId();
+        } while (wasJump.wasJump && currentPlayer.getId() == nextPlayer);
+
+        playerManager.setCurrentPlayer(roundManager.getCurrentId());
     }
 
     private WasJump getGambitJump(int playersCount, int id) {

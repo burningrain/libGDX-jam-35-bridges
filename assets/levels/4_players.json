@@ -5,7 +5,7 @@
         "x": 0,
         "y": 0,
         "player": {
-          "id": 1,
+          "id": 0,
           "playerColorType": "YELLOW",
           "userType": "HUMAN"
         }
@@ -14,7 +14,7 @@
         "x": 0,
         "y": 1,
         "player": {
-          "id": 1,
+          "id": 0,
           "playerColorType": "YELLOW",
           "userType": "HUMAN"
         }
@@ -23,7 +23,7 @@
         "x": 0,
         "y": 2,
         "player": {
-          "id": 1,
+          "id": 0,
           "playerColorType": "YELLOW",
           "userType": "HUMAN"
         }
@@ -40,7 +40,7 @@
         "x": 0,
         "y": 5,
         "player": {
-          "id": 0,
+          "id": 2,
           "playerColorType": "VIOLET",
           "userType": "HUMAN"
         }
@@ -49,7 +49,7 @@
         "x": 0,
         "y": 6,
         "player": {
-          "id": 0,
+          "id": 2,
           "playerColorType": "VIOLET",
           "userType": "HUMAN"
         }
@@ -58,7 +58,7 @@
         "x": 0,
         "y": 7,
         "player": {
-          "id": 0,
+          "id": 2,
           "playerColorType": "VIOLET",
           "userType": "HUMAN"
         }
@@ -69,7 +69,7 @@
         "x": 1,
         "y": 0,
         "player": {
-          "id": 1,
+          "id": 0,
           "playerColorType": "YELLOW",
           "userType": "HUMAN"
         }
@@ -78,7 +78,7 @@
         "x": 1,
         "y": 1,
         "player": {
-          "id": 1,
+          "id": 0,
           "playerColorType": "YELLOW",
           "userType": "HUMAN"
         }
@@ -87,7 +87,7 @@
         "x": 1,
         "y": 2,
         "player": {
-          "id": 1,
+          "id": 0,
           "playerColorType": "YELLOW",
           "userType": "HUMAN"
         }
@@ -104,7 +104,7 @@
         "x": 1,
         "y": 5,
         "player": {
-          "id": 0,
+          "id": 2,
           "playerColorType": "VIOLET",
           "userType": "HUMAN"
         }
@@ -113,7 +113,7 @@
         "x": 1,
         "y": 6,
         "player": {
-          "id": 0,
+          "id": 2,
           "playerColorType": "VIOLET",
           "userType": "HUMAN"
         }
@@ -122,7 +122,7 @@
         "x": 1,
         "y": 7,
         "player": {
-          "id": 0,
+          "id": 2,
           "playerColorType": "VIOLET",
           "userType": "HUMAN"
         }
@@ -133,7 +133,7 @@
         "x": 2,
         "y": 0,
         "player": {
-          "id": 1,
+          "id": 0,
           "playerColorType": "YELLOW",
           "userType": "HUMAN"
         }
@@ -142,7 +142,7 @@
         "x": 2,
         "y": 1,
         "player": {
-          "id": 1,
+          "id": 0,
           "playerColorType": "YELLOW",
           "userType": "HUMAN"
         }
@@ -151,7 +151,7 @@
         "x": 2,
         "y": 2,
         "player": {
-          "id": 1,
+          "id": 0,
           "playerColorType": "YELLOW",
           "userType": "HUMAN"
         }
@@ -168,7 +168,7 @@
         "x": 2,
         "y": 5,
         "player": {
-          "id": 0,
+          "id": 2,
           "playerColorType": "VIOLET",
           "userType": "HUMAN"
         }
@@ -177,7 +177,7 @@
         "x": 2,
         "y": 6,
         "player": {
-          "id": 0,
+          "id": 2,
           "playerColorType": "VIOLET",
           "userType": "HUMAN"
         }
@@ -186,7 +186,7 @@
         "x": 2,
         "y": 7,
         "player": {
-          "id": 0,
+          "id": 2,
           "playerColorType": "VIOLET",
           "userType": "HUMAN"
         }
@@ -265,7 +265,7 @@
         "x": 5,
         "y": 0,
         "player": {
-          "id": 0,
+          "id": 1,
           "playerColorType": "BLUE",
           "userType": "HUMAN"
         }
@@ -274,7 +274,7 @@
         "x": 5,
         "y": 1,
         "player": {
-          "id": 0,
+          "id": 1,
           "playerColorType": "BLUE",
           "userType": "HUMAN"
         }
@@ -283,7 +283,7 @@
         "x": 5,
         "y": 2,
         "player": {
-          "id": 0,
+          "id": 1,
           "playerColorType": "BLUE",
           "userType": "HUMAN"
         }
@@ -300,7 +300,7 @@
         "x": 5,
         "y": 5,
         "player": {
-          "id": 1,
+          "id": 3,
           "playerColorType": "BROWN",
           "userType": "HUMAN"
         }
@@ -309,7 +309,7 @@
         "x": 5,
         "y": 6,
         "player": {
-          "id": 1,
+          "id": 3,
           "playerColorType": "BROWN",
           "userType": "HUMAN"
         }
@@ -318,7 +318,7 @@
         "x": 5,
         "y": 7,
         "player": {
-          "id": 1,
+          "id": 3,
           "playerColorType": "BROWN",
           "userType": "HUMAN"
         }
@@ -329,7 +329,7 @@
         "x": 6,
         "y": 0,
         "player": {
-          "id": 0,
+          "id": 1,
           "playerColorType": "BLUE",
           "userType": "HUMAN"
         }
@@ -338,7 +338,7 @@
         "x": 6,
         "y": 1,
         "player": {
-          "id": 0,
+          "id": 1,
           "playerColorType": "BLUE",
           "userType": "HUMAN"
         }
@@ -347,7 +347,7 @@
         "x": 6,
         "y": 2,
         "player": {
-          "id": 0,
+          "id": 1,
           "playerColorType": "BLUE",
           "userType": "HUMAN"
         }
@@ -364,7 +364,7 @@
         "x": 6,
         "y": 5,
         "player": {
-          "id": 1,
+          "id": 3,
           "playerColorType": "BROWN",
           "userType": "HUMAN"
         }
@@ -373,7 +373,7 @@
         "x": 6,
         "y": 6,
         "player": {
-          "id": 1,
+          "id": 3,
           "playerColorType": "BROWN",
           "userType": "HUMAN"
         }
@@ -382,7 +382,7 @@
         "x": 6,
         "y": 7,
         "player": {
-          "id": 1,
+          "id": 3,
           "playerColorType": "BROWN",
           "userType": "HUMAN"
         }
@@ -393,7 +393,7 @@
         "x": 7,
         "y": 0,
         "player": {
-          "id": 0,
+          "id": 1,
           "playerColorType": "BLUE",
           "userType": "HUMAN"
         }
@@ -402,7 +402,7 @@
         "x": 7,
         "y": 1,
         "player": {
-          "id": 0,
+          "id": 1,
           "playerColorType": "BLUE",
           "userType": "HUMAN"
         }
@@ -411,7 +411,7 @@
         "x": 7,
         "y": 2,
         "player": {
-          "id": 0,
+          "id": 1,
           "playerColorType": "BLUE",
           "userType": "HUMAN"
         }
@@ -428,7 +428,7 @@
         "x": 7,
         "y": 5,
         "player": {
-          "id": 1,
+          "id": 3,
           "playerColorType": "BROWN",
           "userType": "HUMAN"
         }
@@ -437,7 +437,7 @@
         "x": 7,
         "y": 6,
         "player": {
-          "id": 1,
+          "id": 3,
           "playerColorType": "BROWN",
           "userType": "HUMAN"
         }
@@ -446,7 +446,7 @@
         "x": 7,
         "y": 7,
         "player": {
-          "id": 1,
+          "id": 3,
           "playerColorType": "BROWN",
           "userType": "HUMAN"
         }

@@ -3,12 +3,15 @@ package com.github.br.libgdx.jam35.model;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.OrderedMap;
 import com.github.br.libgdx.jam35.model.exception.IncorrectStepException;
 import com.github.br.libgdx.jam35.model.exception.NeedToJumpException;
+import com.github.br.libgdx.jam35.model.round.RoundGenerator;
+import com.github.br.libgdx.jam35.model.round.RoundQueueManager;
 import com.github.br.libgdx.jam35.model.step.Step;
 
+import java.util.Comparator;
 import java.util.HashMap;
 
 public class GameModel {
@@ -17,6 +20,7 @@ public class GameModel {
     private final GridLoader gridLoader = new GridLoader();
     private final Validator validator = new Validator();
     private final PlayerManager playerManager = new PlayerManager();
+    private final RoundQueueManager roundQueueManager = new RoundQueueManager();
     private final LastStepService lastStepService = new LastStepService();
     private final StepResolver stepResolver = new StepResolver(validator, lastStepService);
     private final PointsManager pointsManager = new PointsManager();
@@ -67,6 +71,7 @@ public class GameModel {
         playerManager.clear();
         lastStepService.clear();
         pointsManager.clear();
+        roundQueueManager.clear();
     }
 
     public boolean isGameEnd() {
@@ -176,6 +181,17 @@ public class GameModel {
         notifyListeners();
     }
 
+    public Array<Player> getActivePlayersInTheGame() {
+        ObjectSet<Player> activePlayers = playerManager.getActivePlayersInTheGame(getGrid());
+        Array<Player> playersArray = new Array<>();
+        for (Player player : activePlayers) {
+            playersArray.add(player);
+        }
+        playersArray.sort(Comparator.comparingInt(Player::getId));
+
+        return playersArray;
+    }
+
     public void addPlayer(PlayerColorType playerColorType, UserType userType) {
         playerManager.addPlayer(playerColorType, userType);
     }
@@ -233,7 +249,7 @@ public class GameModel {
                 this.stepHandler = new TwoPlayerStepHandler(this, playerManager);
                 break;
             case FOUR_PLAYERS:
-                this.stepHandler = new FourPlayerStepHandler(this, playerManager);
+                this.stepHandler = new FourPlayerStepHandler(this, playerManager, roundQueueManager);
                 break;
             default:
                 throw new IllegalArgumentException("gameMode=[" + gameMode + "] isn't supported");
@@ -250,6 +266,14 @@ public class GameModel {
 
     public OrderedMap<Player, Integer> getPlayersPoints() {
         return pointsManager.getPlayersPoints();
+    }
+
+    public void setRoundGenerator(RoundGenerator roundGenerator) {
+        roundQueueManager.setRoundGenerator(roundGenerator);
+    }
+
+    public void initRound() {
+        roundQueueManager.init();
     }
 
     // observer
